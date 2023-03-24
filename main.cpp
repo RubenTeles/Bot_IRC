@@ -6,7 +6,7 @@
 /*   By: rteles <rteles@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/03 23:46:08 by rteles            #+#    #+#             */
-/*   Updated: 2023/03/23 18:08:15 by rteles           ###   ########.fr       */
+/*   Updated: 2023/03/23 21:41:15 by rteles           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,8 +22,10 @@ int main(int argc, char **argv)
 			return (0);
 		}
 
-		Bot *b = new Bot(argv[1], argv[2], argv[3] ? argv[3] : "", "Marvin");
+		Bot *b = new Bot(argv[1], argv[2], argc > 3 ? argv[3] : "", argc > 4 ? argv[4] : "Marvin");
+		
 		b->run();
+		
 		delete b;
 	}
 	catch(const std::exception& e) {

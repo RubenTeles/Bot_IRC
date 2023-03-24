@@ -6,7 +6,7 @@
 /*   By: rteles <rteles@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/22 16:39:47 by rteles            #+#    #+#             */
-/*   Updated: 2023/03/23 18:28:28 by rteles           ###   ########.fr       */
+/*   Updated: 2023/03/24 17:32:32 by rteles           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ _name(name), _hostname(host), _port(port), _password(password)
 	this->pollEvents = new pollfd[1];
 
 	pollEvents[0].fd = _socket;
-  	pollEvents[0].events = POLLIN;	
+  	pollEvents[0].events = POLLIN | POLLHUP;	
 	/*pollEvents[1].fd = host_connect;
   	pollEvents[1].events = POLLIN;*/
 	//close(_socket);
@@ -71,18 +71,24 @@ Bot & Bot::operator=(Bot const & rhs)
 
 void	Bot::authenticate(void)
 {
-	std::string login = "NICK " + this->_name + "\r\n" + "USER " + this->_name + " 0 * :" + this->_name;
-	
-	send(_socket, login.c_str(), login.size(), 0);
+	if (!_password.empty())
+		sendMessage("PASS :", this->_password);
+	else
+		sendMessage("PASS ", this->_password);
+	usleep(100);
+	sendMessage("NICK ", this->_name);
+	usleep(100);
+	sendMessage("USER ", this->_name + " 0 * :" + this->_name);
+	usleep(100);
+	sendMessage("CAP ", "END");
 }
-/*
-void Bot::sendMessage(std::string const message)
+
+void Bot::sendMessage(std::string const command, std::string const message)
 {
-	std::string	message_for_send = message + "\r\n";
-	send(this->_socket, message.c_str(), message.size(), 0);
-	
-    //std::cout << "* use something in " << target.getName() << " *" << std::endl;
-}*/
+	std::string	message_for_send = command + message + "\r\n";
+
+	send(this->_socket, message_for_send.c_str(), message_for_send.size(), 0);
+}
 
 void Bot::run(void)
 {
@@ -98,7 +104,7 @@ void Bot::run(void)
 		}*/
 		if (pollEvents[0].revents & POLLHUP) //Quando encerra a conexao
 		{
-			std::cout << this->_name << "A Encerrar..." << std::endl;
+			std::cout << this->_name << " a Encerrar..." << std::endl;
         	break ;
 		}
 		/*if (pollEvents[0].fd == _socket)
@@ -111,13 +117,13 @@ void Bot::run(void)
 		{
 			std::cout << "recebeu" << std::endl;
 			this->recive();
-			pollEvents[0].events = POLLIN;
+			pollEvents[0].events = POLLIN | POLLHUP;
 			pollEvents[0].revents = 0;
 		}
 		/*else if (!(pollEvents[0].revents & POLLOUT)) //mandou mensagem
 			std::cout << i << " POLL: " << pollEvents[i].revents << "\n";  */      
 	}
-
+	sendMessage("QUIT :", BOT_LEAVE(_name));
 	close(_socket);
 }
 
@@ -145,32 +151,141 @@ void	Bot::recive(void)
 	this->response(message);
 }
 
+/*
+Prefixo: :alice!user@example.com
+Comando: PRIVMSG
+Parâmetro 1: #general
+Parâmetro 2: Oi, como você está?
+//Envio:
+
+PRIVMSG #general :Oi, estou bem! E você?
+		ou
+PRIVMSG alice :Oi, estou bem! E você?
+*/
+void	Bot::privateMessage(std::string message)
+{
+/*
+:alice!user@example.com PRIVMSG meu_bot :Hello, como você está?
+:alice!user@example.com PRIVMSG meu_bot :!help
+:alice!user@example.com PRIVMSG meu_bot :!game
+:alice!user@example.com PRIVMSG #general meu_bot :!game
+*/
+	std::string		user = "";
+	std::string		canal = "";
+	std::string		command = "PRIVMSG ";
+	std::string		callBack = "";
+    std::size_t     found;
+	char 			str[10];
+
+	found = message.find(":");
+	if (found != 0)
+		return ;
+	message = message.substr(1, message.size()).c_str();
+	found = message.find(":");
+	if (found == std::string::npos)
+		return ;
+	user = message.substr(0, message.find("!")).c_str();
+	if (message.find("#") != std::string::npos)
+	{
+		canal = message.substr(message.find("#"), message.find(":")).c_str();
+		canal = canal.substr(canal.find("#"), canal.find(" ")).c_str();
+	}
+
+	message = message.substr(message.find(":")+1, message.size()).c_str();
+
+	callBack = message;
+
+	std::cout << message << std::endl;
+	if (message.find("Hello") != std::string::npos)
+	{
+		std::cout << "hello" << std::endl;
+		callBack = BOT_HELLO(_name, user);
+	}
+	else if (message.find("!help") != std::string::npos ||
+			message.find("!Help") != std::string::npos ||
+			message.find("!HELP") != std::string::npos)
+	{
+		std::cout << "help" << std::endl;
+		callBack = BOT_HELP(_name);
+	}
+	else if (message.find("!game") != std::string::npos ||
+			message.find("!Game") != std::string::npos ||
+			message.find("!GAME") != std::string::npos)
+	{
+		std::srand(time(NULL));
+		int random = (1 + (std::rand() % 10));
+		
+		callBack = BOT_GAME(_name);
+		sendMessage(command + user + " :", callBack);
+		for (int i = 1; i < 10; i++)
+			sleep(1);
+		sprintf(str, "%d", random);
+		callBack = "The Number is: ";
+		callBack += str;
+	}
+	else
+		callBack = "*Existing*";
+	if (canal.empty())
+		sendMessage(command + user + " :", callBack);
+	else
+		sendMessage(command + canal + " :", callBack);
+}
+
 void	Bot::response(std::string message)
 {
 	std::string		line;
     std::size_t     found;
+	std::string		command = "";
 	std::string		value;
 	std::string		callBack = "";
 
-char str[10];
+	char str[10];
 
-
-	if (message.find("PING") == 0 && message.size() == 5)
-		callBack = "PONG";
+	if (message.find("PING") == 0)
+	{
+		value = message.substr(4, message.length()).c_str();
+		callBack = "PONG" + value;
+		sendMessage("", callBack);
+	}
 	else
 	{
-		found = message.find("PRIVMSG");
-		if (found == 0)
-		{
-			value = message.substr(8, message.length()).c_str();
-			callBack = "Mandaste messagem privada maroto!";
-		}
+		found = message.find(" PRIVMSG ");
+		if (found != std::string::npos)
+			this->privateMessage(message);
 		else
 		{
 			sprintf(str, "%ld", message.size());
 			callBack = "Escreveste: \n" + message + " " + str;
+			std::cout << "escreveste: " << message << std::endl;
+			sendMessage("", callBack);
 		}
+
+		/*if (message.find("PRIVMSG") == 0)
+		{
+			found = message.find(":");
+			command = message.substr(0, found).c_str();
+			message = message.substr(found+1, found).c_str();
+			if (message.find("!GAME"))
+				sendMessage(command, );
+			callBack = "Mandaste messagem privada maroto!";
+		}*/
 	}
-	
-	send(this->_socket, callBack.c_str(), callBack.size(), 0);
 }
+
+/*
+
+//Recebo:
+:alice!user@example.com PRIVMSG meu_bot :Oi, como você está?
+
+Prefixo: :alice!user@example.com
+Comando: PRIVMSG
+Parâmetro 1: #general
+Parâmetro 2: Oi, como você está?
+
+//Envio:
+
+PRIVMSG #general :Oi, estou bem! E você?
+		ou
+PRIVMSG alice :Oi, estou bem! E você?
+
+*/	
