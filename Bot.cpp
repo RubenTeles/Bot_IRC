@@ -6,7 +6,7 @@
 /*   By: rteles <rteles@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/22 16:39:47 by rteles            #+#    #+#             */
-/*   Updated: 2023/03/25 01:52:06 by rteles           ###   ########.fr       */
+/*   Updated: 2023/03/25 16:47:39 by rteles           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ _name(name), _hostname(host), _port(port), _password(password)
 {
     struct sockaddr_in   target;
     
-    _socket = socket(AF_INET, SOCK_STREAM, 0);
+    _socket = socket(AF_INET, SOCK_STREAM, 0);//IPV 4, TCP
 
 	if (_socket < 0)
 		throw std::runtime_error("Error: While opening socket.");
@@ -75,8 +75,6 @@ void	Bot::authenticate(void)
 {
 	if (!_password.empty())
 		sendMessage("PASS :", this->_password);
-	else
-		sendMessage("PASS ", this->_password);
 	usleep(100);
 	sendMessage("NICK ", this->_name);
 	usleep(100);
@@ -98,7 +96,10 @@ void Bot::run(void)
     while (true)
     {
         if (poll(pollEvents, 1, -1) < 0) //poll
+		{
+			delete this;
 			throw std::runtime_error("Erro: Waiting for Events!");
+		}
 		if (pollEvents[0].revents & POLLHUP) //Quando encerra a conexao
 		{
 			std::cout << this->_name << " a Encerrar..." << std::endl;
@@ -127,7 +128,10 @@ int	Bot::recive(void)
 	while (size)
 	{
 		if (size < 0)
-			throw std::runtime_error("Erro: Recive!");
+		{
+			std::cerr << "Erro: Recive!" << std::endl;
+			return 1;
+		}
 		buffer[size] = '\0';
 		message += buffer;
 		if (size != BUFFER_SIZE)
@@ -175,14 +179,14 @@ void	Bot::privateMessage(std::string message)
 	found = message.find(":");
 	if (found == std::string::npos)
 		return ;
-	user = message.substr(0, message.find("!")).c_str();
+	user = message.substr(0, message.find("!user")).c_str();
 	if (message.find("#") != std::string::npos)
 	{
 		canal = message.substr(message.find("#"), message.find(":")).c_str();
 		canal = canal.substr(canal.find("#"), canal.find(" ")).c_str();
 	}
 
-	message = message.substr(message.find(":")+1, message.size()).c_str();
+	callBack = message.substr(message.find(":")+1, message.size()).c_str();
 
 	callBack = message;
 
