@@ -6,7 +6,7 @@
 /*   By: rteles <rteles@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/22 16:39:44 by rteles            #+#    #+#             */
-/*   Updated: 2023/03/24 13:12:56 by rteles           ###   ########.fr       */
+/*   Updated: 2023/03/25 00:56:36 by rteles           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,8 +50,8 @@ class Bot
 
         void    authenticate(void);
 		void	run(void);
-		void	recive(void);
-		void	response(std::string message);
+		int 	recive(void);
+		int 	response(std::string message);
 		void	sendMessage(std::string const command, std::string const message);
 		void	privateMessage(std::string message);
 

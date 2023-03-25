@@ -6,7 +6,7 @@
 /*   By: rteles <rteles@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/22 16:39:47 by rteles            #+#    #+#             */
-/*   Updated: 2023/03/24 17:32:32 by rteles           ###   ########.fr       */
+/*   Updated: 2023/03/25 01:52:06 by rteles           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,14 +37,12 @@ _name(name), _hostname(host), _port(port), _password(password)
     if (host_connect < 0)
 		throw std::runtime_error("Erro: Bot can't connect the Server!");
 	
-	std::cout << "Conectado!" << std::endl;
-	
 	this->pollEvents = new pollfd[1];
 
 	pollEvents[0].fd = _socket;
-  	pollEvents[0].events = POLLIN | POLLHUP;	
-	/*pollEvents[1].fd = host_connect;
-  	pollEvents[1].events = POLLIN;*/
+  	pollEvents[0].events = POLLIN;
+	//pollEvents[1].fd = host_connect;
+  	//pollEvents[1].events = POLLIN;
 	//close(_socket);
 	//close(host_connect);
 }
@@ -63,7 +61,11 @@ Bot & Bot::operator=(Bot const & rhs)
 {
     if (this != &rhs)
     {
-        //this->_type = rhs._type;
+        this->_name = rhs._name;
+		this->_hostname = rhs._hostname;
+		this->_port = rhs._port;
+		this->_password = rhs._password;
+		this->_socket = rhs._socket;
     }
 
     return *this;
@@ -97,37 +99,25 @@ void Bot::run(void)
     {
         if (poll(pollEvents, 1, -1) < 0) //poll
 			throw std::runtime_error("Erro: Waiting for Events!");
-
-        /*if (pollEvents[0].revents == 0)
-		{
-        	continue ;
-		}*/
 		if (pollEvents[0].revents & POLLHUP) //Quando encerra a conexao
 		{
 			std::cout << this->_name << " a Encerrar..." << std::endl;
         	break ;
 		}
-		/*if (pollEvents[0].fd == _socket)
-		{
-			std::cout << "soocket\n";
-	        //execute(NULL, "connect");
-		}
-		else */
 		if (pollEvents[0].revents & POLLIN) //recebeu um comando
 		{
-			std::cout << "recebeu" << std::endl;
-			this->recive();
-			pollEvents[0].events = POLLIN | POLLHUP;
+			if (this->recive() == 1)
+				break ;
+			pollEvents[0].events = POLLIN;
 			pollEvents[0].revents = 0;
 		}
-		/*else if (!(pollEvents[0].revents & POLLOUT)) //mandou mensagem
-			std::cout << i << " POLL: " << pollEvents[i].revents << "\n";  */      
+	
 	}
 	sendMessage("QUIT :", BOT_LEAVE(_name));
 	close(_socket);
 }
 
-void	Bot::recive(void)
+int	Bot::recive(void)
 {
 	int			size;
 	char		buffer[BUFFER_SIZE];
@@ -137,7 +127,7 @@ void	Bot::recive(void)
 	while (size)
 	{
 		if (size < 0)
-			throw std::runtime_error("Erro: Recive Dates!");
+			throw std::runtime_error("Erro: Recive!");
 		buffer[size] = '\0';
 		message += buffer;
 		if (size != BUFFER_SIZE)
@@ -146,9 +136,9 @@ void	Bot::recive(void)
 	}
 
 	if (message.empty())
-		return ;
+		return 0;
 
-	this->response(message);
+	return this->response(message);
 }
 
 /*
@@ -168,6 +158,7 @@ void	Bot::privateMessage(std::string message)
 :alice!user@example.com PRIVMSG meu_bot :Hello, como você está?
 :alice!user@example.com PRIVMSG meu_bot :!help
 :alice!user@example.com PRIVMSG meu_bot :!game
+:alice!user@example.com PRIVMSG meu_bot :sad
 :alice!user@example.com PRIVMSG #general meu_bot :!game
 */
 	std::string		user = "";
@@ -195,19 +186,15 @@ void	Bot::privateMessage(std::string message)
 
 	callBack = message;
 
-	std::cout << message << std::endl;
+	//	------ Message -------	
+	//std::cout << message << std::endl;
+	
 	if (message.find("Hello") != std::string::npos)
-	{
-		std::cout << "hello" << std::endl;
 		callBack = BOT_HELLO(_name, user);
-	}
 	else if (message.find("!help") != std::string::npos ||
 			message.find("!Help") != std::string::npos ||
 			message.find("!HELP") != std::string::npos)
-	{
-		std::cout << "help" << std::endl;
 		callBack = BOT_HELP(_name);
-	}
 	else if (message.find("!game") != std::string::npos ||
 			message.find("!Game") != std::string::npos ||
 			message.find("!GAME") != std::string::npos)
@@ -220,26 +207,28 @@ void	Bot::privateMessage(std::string message)
 		for (int i = 1; i < 10; i++)
 			sleep(1);
 		sprintf(str, "%d", random);
-		callBack = "The Number is: ";
-		callBack += str;
+		callBack = BOT_GAME_RESULT(_name, str);
 	}
 	else
-		callBack = "*Existing*";
+		callBack = BOT_EXISTING(_name);
+
+	std::cout << "\033[32m[" << user << "] \033[0m" << message;
+	std::cout << callBack << std::endl;
+	
 	if (canal.empty())
 		sendMessage(command + user + " :", callBack);
 	else
 		sendMessage(command + canal + " :", callBack);
+
 }
 
-void	Bot::response(std::string message)
+int	Bot::response(std::string message)
 {
 	std::string		line;
     std::size_t     found;
 	std::string		command = "";
 	std::string		value;
 	std::string		callBack = "";
-
-	char str[10];
 
 	if (message.find("PING") == 0)
 	{
@@ -254,26 +243,27 @@ void	Bot::response(std::string message)
 			this->privateMessage(message);
 		else
 		{
-			sprintf(str, "%ld", message.size());
-			callBack = "Escreveste: \n" + message + " " + str;
-			std::cout << "escreveste: " << message << std::endl;
-			sendMessage("", callBack);
+			if (message.find(":Password incorrect") != std::string::npos && message.find("464") != std::string::npos)
+			{
+				std::cerr << "Erro: Password incorrect!" << std::endl;
+				return 1;
+			}
+			if (message.find(":Nickname incorreta.") != std::string::npos && message.find("433") != std::string::npos)
+			{
+				std::cerr << "Erro: Nickname incorrect!" << std::endl;
+				return 1;
+			}
+			if (message.find(":Welcome to server, "+this->_name) != std::string::npos && message.find("001") != std::string::npos)
+			{
+				std::cout << "\033[32mConnected!\033[0m" << std::endl;
+				return 0;
+			}
+			std::cout << message << std::endl;
 		}
-
-		/*if (message.find("PRIVMSG") == 0)
-		{
-			found = message.find(":");
-			command = message.substr(0, found).c_str();
-			message = message.substr(found+1, found).c_str();
-			if (message.find("!GAME"))
-				sendMessage(command, );
-			callBack = "Mandaste messagem privada maroto!";
-		}*/
 	}
+	return 0;
 }
-
 /*
-
 //Recebo:
 :alice!user@example.com PRIVMSG meu_bot :Oi, como você está?
 
@@ -287,5 +277,23 @@ Parâmetro 2: Oi, como você está?
 PRIVMSG #general :Oi, estou bem! E você?
 		ou
 PRIVMSG alice :Oi, estou bem! E você?
+*/
 
-*/	
+/*
+    std::string user = "";
+    int         send_fd = -1;
+    std::string message = "PRIVMSG ";
+
+    user = data.substr(0, data.find_first_of(SPACES, 0));
+    
+    if (user.empty())
+        return ;
+    
+    message = "PRIVMSG " + user + " ";
+    std::cout << "User: " << user << std::endl;
+    std::cout << "message: " << message << std::endl;
+    
+	data = &data[user.size()];
+	data = trim(data);
+    std::cout << "data: " << data << std::endl;
+*/
