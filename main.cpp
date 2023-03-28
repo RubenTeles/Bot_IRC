@@ -6,14 +6,29 @@
 /*   By: rteles <rteles@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/03 23:46:08 by rteles            #+#    #+#             */
-/*   Updated: 2023/03/25 16:23:05 by rteles           ###   ########.fr       */
+/*   Updated: 2023/03/28 09:00:28 by rteles           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Bot.hpp"
+#include <csignal>
+
+Bot *b = NULL;
+
+void signal_handler(int signal)
+{
+	(void)signal;
+	if (b != NULL)
+	{
+		b->quit();
+		delete b;	
+	}
+	exit(1);
+}
 
 int main(int argc, char **argv)
 {
+	std::signal(SIGINT, signal_handler);
 	try
 	{
 	    if (argc < 3)
@@ -22,7 +37,7 @@ int main(int argc, char **argv)
 			return (0);
 		}
 
-		Bot *b = new Bot(argv[1], argv[2], argc > 3 ? argv[3] : "", argc > 4 ? argv[4] : "Marvin");
+		b = new Bot(argv[1], argv[2], argc > 3 ? argv[3] : "", argc > 4 ? argv[4] : "Marvin");
 		
 		b->run();
 		
