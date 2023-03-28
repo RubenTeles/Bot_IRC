@@ -6,7 +6,7 @@
 /*   By: rteles <rteles@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/22 16:39:44 by rteles            #+#    #+#             */
-/*   Updated: 2023/03/28 09:03:05 by rteles           ###   ########.fr       */
+/*   Updated: 2023/03/28 17:52:25 by rteles           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,8 +21,10 @@
 #include <string.h>
 #include <sys/poll.h>
 #include <sstream>
-
 #include <stdlib.h>
+#include <map>
+#include <algorithm>
+#include <list>
 #include "Msg.hpp"
 
 #define BUFFER_SIZE 1024
@@ -36,6 +38,7 @@ class Bot
 		std::string	_password;
         int			_socket;
 		pollfd		*pollEvents;
+        std::map<std::string, std::map<std::string, int> > _clients;
 
         Bot(void);
 
@@ -56,6 +59,14 @@ class Bot
 		void	privateMessage(std::string message);
         void    debug(std::string message, std::string callBack, std::string user, std::string channel);
         void    quit(void);
+
+        //Games
+        std::string	rockPapperScissors(std::string nick, std::string choise);
+
+        //Client [EXP]
+        std::map<std::string, int>  &addClient(std::string nick);
+        void                        setClient(std::string nick, bool isWin, int exp);
+        void	                    leaderBoard(void);
 
 };
 

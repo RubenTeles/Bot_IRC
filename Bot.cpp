@@ -6,7 +6,7 @@
 /*   By: rteles <rteles@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/22 16:39:47 by rteles            #+#    #+#             */
-/*   Updated: 2023/03/28 09:22:03 by rteles           ###   ########.fr       */
+/*   Updated: 2023/03/28 17:42:35 by rteles           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -207,7 +207,7 @@ rteles!rteles@localhost PRIVMSG #public :Hello
 	callBack = message;
 
 	//	------ Message -------	
-	std::cout << message << std::endl;
+	//std::cout << message << std::endl;
 	
 	if (message.find("Hello") != std::string::npos ||
 		message.find("hello") != std::string::npos)
@@ -323,3 +323,75 @@ PRIVMSG alice :Oi, estou bem! E você?
 	data = trim(data);
     std::cout << "data: " << data << std::endl;
 */
+
+std::map<std::string, int> &Bot::addClient(std::string nick)
+{
+	bool isExiste = false;
+	
+	if (!_clients[nick].empty())
+		return _clients[nick];
+
+    std::map<std::string, int> client;
+
+	client["EXP"] = 0;
+	client["WIN"] = 0;
+	client["LEVEL"] = 1;
+	
+   // std::map<std::string, int> map_aux;
+   
+    /*map_aux.insert(std::make_pair("EXP", 0));
+    map_aux.insert(std::make_pair("LEVEL", 1));
+    map_aux.insert(std::make_pair("WIN", 0));*/
+
+	_clients[nick] = client;
+	
+	return _clients[nick];
+}
+
+void	Bot::setClient(std::string nick, bool isWin, int exp)
+{
+	if (nick == _name)
+		return ;
+
+	std::map<std::string, int> client = this->addClient(nick);
+
+	client["EXP"] += exp;
+	client["WIN"] += isWin ? 1 : 0;
+
+	if (client["EXP"] >= client["LEVEL"] * 100)
+	{
+		client["EXP"] -= client["LEVEL"] * 100;
+		client["LEVEL"] += 1;
+		std::cout << nick << " up for Level " << client["LEVEL"] << "!" << std::endl;
+	}
+
+	_clients[nick] = client;
+}
+
+void	Bot::leaderBoard(void)
+{
+	std::map<std::string, std::map<std::string, int> >::iterator it;
+	
+   	std::list<int> board;
+	
+    std::cout << "Clients: " << this->_clients.size() << std::endl;
+
+    for (it = this->_clients.begin(); it != this->_clients.end(); ++it) 
+    {
+		board.push_back((it->second["LEVEL"] * 100) + it->second["EXP"]);
+	}
+	
+	board.sort();
+
+	std::list<int>::iterator list_it;
+	int i = 1;
+	for (list_it = board.begin(); list_it != board.end(); ++list_it) 
+    {
+		for (it = this->_clients.begin(); it != this->_clients.end(); ++it) 
+    	{
+			if (*list_it == (it->second["LEVEL"] * 100) + it->second["EXP"])
+				std::cout << i << "º - " << it->first << " (LVL: " << it->second["LEVEL"] << ", EXP: " << it->second["EXP"] << std::endl;	
+		}
+		i++;
+	}
+}
