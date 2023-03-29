@@ -6,7 +6,7 @@
 /*   By: rteles <rteles@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/22 16:39:44 by rteles            #+#    #+#             */
-/*   Updated: 2023/03/29 18:10:32 by rteles           ###   ########.fr       */
+/*   Updated: 2023/03/29 18:16:56 by rteles           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,17 +70,17 @@ class Bot
         void                        setPlayer(std::string nick, bool isWin, int exp);
         std::string                 showLeaderBoard(void);
 
+        std::string convertToInt(int input)
+        {
+            std::ostringstream stream;
+            
+        	stream << input;
+        
+            std::string nbr = stream.str();
+        
+        	return nbr;
+        }
 };
 
-static std::string convertToInt(int input)
-{
-    std::ostringstream stream;
-    
-	stream << input;
-
-    std::string nbr = stream.str();
-	
-	return nbr;
-}
 
 #endif
