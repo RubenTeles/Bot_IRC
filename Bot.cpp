@@ -6,7 +6,7 @@
 /*   By: rteles <rteles@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/22 16:39:47 by rteles            #+#    #+#             */
-/*   Updated: 2023/03/29 18:10:25 by rteles           ###   ########.fr       */
+/*   Updated: 2023/03/30 00:46:17 by rteles           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -203,41 +203,26 @@ rteles!rteles@localhost PRIVMSG #public :Hello
 
 	callBack = message.substr(message.find(":")+1, message.size()).c_str();
 
-	callBack = message;
-
-	//	------ Message -------	
-	std::cout << callBack << std::endl;
-	
-	if (message.find("Hello") != std::string::npos ||
-		message.find("hello") != std::string::npos)
+	if (callBack.find("Hello") != std::string::npos ||
+		callBack.find("hello") != std::string::npos)
 		callBack = BOT_HELLO(user);
-	else if (message.find("!help") != std::string::npos ||
-			message.find("!Help") != std::string::npos ||
-			message.find("!HELP") != std::string::npos)
+	else if (callBack.find("!help game") != std::string::npos ||
+			callBack.find("!Help Game") != std::string::npos ||
+			callBack.find("!HELP GAME") != std::string::npos)
+		callBack = BOT_HELP_GAME();
+	else if (callBack.find("!help") != std::string::npos ||
+			callBack.find("!Help") != std::string::npos ||
+			callBack.find("!HELP") != std::string::npos)
 		callBack = BOT_HELP();
-	else if (message.find("!game") != std::string::npos ||
-			message.find("!Game") != std::string::npos ||
-			message.find("!GAME") != std::string::npos)
+	else if (callBack.find("!game") != std::string::npos ||
+			callBack.find("!Game") != std::string::npos ||
+			callBack.find("!GAME") != std::string::npos)
 	{
-		game(user, channel, message, "JanKenPo", "rock");
-		/*std::srand(time(NULL));
-		int random = (1 + (std::rand() % 10));
+		game(user, channel, message, callBack.substr(callBack.find("!game")+5, callBack.size()).c_str(), "rock");
 		
-		callBack = BOT_GAME();
-
-		debug(message, callBack,user, channel);
-			
-		for (int i = 1; i < 10; i++)
-			sleep(1);
-		
-    	std::ostringstream stream;
-    	stream << random;
-    	std::string nbr = stream.str();
-		
-		callBack = BOT_GAME_RESULT(nbr);*/
 		return ;
 	}
-	else if (message.find("!leaderboard") != std::string::npos)
+	else if (callBack.find("!leaderboard") != std::string::npos)
 	{
 		callBack = showLeaderBoard();
 		channel = "";

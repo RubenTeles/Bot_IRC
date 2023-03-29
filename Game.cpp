@@ -6,7 +6,7 @@
 /*   By: rteles <rteles@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/22 16:39:47 by rteles            #+#    #+#             */
-/*   Updated: 2023/03/29 18:10:54 by rteles           ###   ########.fr       */
+/*   Updated: 2023/03/30 00:48:50 by rteles           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,14 +14,12 @@
 
 std::string convertInput(int input)
 {
-	std::cout << "INPUT: " << input << std::endl;
-
 	if (input == 1)
-		return "rock";
+		return "Rock";
 	else if (input == 2)
-		return "paper";
+		return "Paper";
 	else if (input == 3)
-		return "scissor";
+		return "Scissor";
 	else
 		return "";
 }
@@ -29,32 +27,31 @@ std::string convertInput(int input)
 std::string	Bot::rockPapperScissors(std::string nick, std::string choise)
 {
 	std::string result = choise;
-	int			input;
+	int			input = 0;
 	std::srand(time(NULL));
 	int random = 1 + (std::rand() % 3);
 	
-	if (choise != "rock" && choise != "paper" && choise != "scissor")
-		return BOT_ERRO(nick, choise);
-
-	if (choise == "rock")
+	if (choise.find("rock") != std::string::npos)
 		input = 1;
-	else if (choise == "paper")
+	else if (choise.find("paper") != std::string::npos)
 		input = 2;
-	else if (choise == "scissor")
+	else if (choise.find("scissor") != std::string::npos)
 		input = 3;
+	else
+		return BOT_ERRO(nick, choise);
 	
 	if (input == random)
 	{
 		setPlayer(nick, false, 50);
-		result = BOT_DRAW(nick, "50") + " " + choise + " draw with a " + choise + "!";
+		result = BOT_DRAW(nick, "50") + " " + convertInput(input) + " draw with a " + convertInput(input) + "!";
 	}
 	else if (input - random == 1 || input - random == -2)
 	{
-		result = BOT_YOU_WIN(nick, "200") + " " + choise + " win a " + convertInput(random) + "!";
+		result = BOT_YOU_WIN(nick, "200") + " " + convertInput(input) + " win a " + convertInput(random) + "!";
 		setPlayer(nick, true, 200);
 	}
 	else
-		result = BOT_YOU_LOSE(nick) + " " + choise + " lose for a " + convertInput(random) + "!";
+		result = BOT_YOU_LOSE(nick) + " " + convertInput(input) + " lose for a " + convertInput(random) + "!";
 		
 	return result;
 }
@@ -69,13 +66,6 @@ std::string Bot::guessNumber(std::string nick, std::string choise)
 	std::string result = "";
 	std::srand(time(NULL));
 	int random = (1 + (std::rand() % 10));
-	
-	/*callBack = BOT_GAME();
-	debug(message, callBack,user, channel);
-		
-	for (int i = 1; i < 10; i++)
-		sleep(1);*/
-
     std::istringstream iss(choise);
 	int input;
 
@@ -89,21 +79,27 @@ std::string Bot::guessNumber(std::string nick, std::string choise)
 		result = BOT_YOU_WIN(nick, "500");
 		setPlayer(nick, true, 500);
 	}
+	else if (input > 10 || input < 1)
+		return BOT_ERRO(nick, choise);
 	else
 		result = BOT_YOU_LOSE(nick);
 
-	return BOT_GAME_RESULT(convertToInt(random) + "\n" + result);
+	return result + " " + BOT_GAME_RESULT(convertToInt(random));
 }
 
 void Bot::game(std::string user, std::string channel, std::string message, std::string game, std::string choise)
 {
 	std::string callBack = "";
-
+	(void)choise;
 	addPlayer(user);
-	if (game == "JanKenPo" || game == "jankenpo")
-		callBack = rockPapperScissors(user, choise);
-	else if (game == "GuessNumber" || game == "guessnumber")
-		callBack = guessNumber(user, choise);
+	if (game.find("JanKenPo") != std::string::npos)
+		callBack = rockPapperScissors(user, game.substr(game.find("JanKenPo")+9, game.size()).c_str());
+	else if (game.find("jankenpo") != std::string::npos)
+		callBack = rockPapperScissors(user, game.substr(game.find("jankenpo")+9, game.size()).c_str());
+	else if (game.find("GuessNumber") != std::string::npos)
+		callBack = guessNumber(user, game.substr(game.find("GuessNumber")+11, game.size()).c_str());
+	else if (game.find("guessnumber") != std::string::npos)
+		callBack = guessNumber(user, game.substr(game.find("guessnumber")+11, game.size()).c_str());
 
 	if (!callBack.empty())
 		debug(message, callBack, user, channel);

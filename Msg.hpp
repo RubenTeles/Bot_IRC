@@ -6,7 +6,7 @@
 /*   By: rteles <rteles@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/24 13:11:36 by rteles            #+#    #+#             */
-/*   Updated: 2023/03/29 17:38:13 by rteles           ###   ########.fr       */
+/*   Updated: 2023/03/30 00:44:19 by rteles           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ list               list of channel\n\
 me                 defined an action\n\
 ------------- BOT -------------\n\
 !help		       	show help list\n\
-!help games           show game list\n\
+!help game           show game list\n\
 !game [game] [yourChoise]   play a game \"Guess a Number\"\n\
 !leaderboard        show the Leader Board\n")
 
@@ -44,6 +44,6 @@ me                 defined an action\n\
 #define BOT_DRAW(nick, exp) std::string(nick + " it's draw, you win " + exp + " exp!")
 #define BOT_YOU_LOSE(nick) std::string(nick + " you lose!")
 
-#define BOT_ERRO(nick, choise) std::string(nick + " the " + choise + " isn't a good input! See !help command.")
+#define BOT_ERRO(nick, choise) std::string(nick + " this isn't a good input! See !help command.")
 
 #endif
