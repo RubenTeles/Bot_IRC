@@ -6,7 +6,7 @@
 /*   By: rteles <rteles@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/22 16:39:44 by rteles            #+#    #+#             */
-/*   Updated: 2023/03/28 17:52:25 by rteles           ###   ########.fr       */
+/*   Updated: 2023/03/29 18:10:32 by rteles           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@
 #include <stdlib.h>
 #include <map>
 #include <algorithm>
-#include <list>
+#include <vector>
 #include "Msg.hpp"
 
 #define BUFFER_SIZE 1024
@@ -38,7 +38,7 @@ class Bot
 		std::string	_password;
         int			_socket;
 		pollfd		*pollEvents;
-        std::map<std::string, std::map<std::string, int> > _clients;
+        std::map<std::string, std::map<std::string, int> > _players;
 
         Bot(void);
 
@@ -61,13 +61,26 @@ class Bot
         void    quit(void);
 
         //Games
+        void        game(std::string user, std::string channel, std::string message, std::string game, std::string choise);
         std::string	rockPapperScissors(std::string nick, std::string choise);
+        std::string guessNumber(std::string nick, std::string choise);
 
-        //Client [EXP]
-        std::map<std::string, int>  &addClient(std::string nick);
-        void                        setClient(std::string nick, bool isWin, int exp);
-        void	                    leaderBoard(void);
+        //Player [EXP]
+        std::map<std::string, int>  &addPlayer(std::string nick);
+        void                        setPlayer(std::string nick, bool isWin, int exp);
+        std::string                 showLeaderBoard(void);
 
 };
+
+static std::string convertToInt(int input)
+{
+    std::ostringstream stream;
+    
+	stream << input;
+
+    std::string nbr = stream.str();
+	
+	return nbr;
+}
 
 #endif

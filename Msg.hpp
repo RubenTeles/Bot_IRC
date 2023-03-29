@@ -6,7 +6,7 @@
 /*   By: rteles <rteles@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/24 13:11:36 by rteles            #+#    #+#             */
-/*   Updated: 2023/03/28 09:10:33 by rteles           ###   ########.fr       */
+/*   Updated: 2023/03/29 17:38:13 by rteles           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,12 +25,25 @@ list               list of channel\n\
 me                 defined an action\n\
 ------------- BOT -------------\n\
 !help		       	show help list\n\
-!game		       play a game \"Guess a Number")
+!help games           show game list\n\
+!game [game] [yourChoise]   play a game \"Guess a Number\"\n\
+!leaderboard        show the Leader Board\n")
+
+#define	BOT_HELP_GAME() std::string("------------ GAMES ------------\n\
+!game JanKenPo [rock/papper/scissors]   play a game \"JanKenPo\"\n\
+!game GuessNumber [1-10]   play a game \"Guess a Number\"")
+
 
 #define	BOT_GAME() std::string("Let's PLAY A GAME! Guess the number I'm thinking of from 1 to 10! You have 10 seconds to guess!")
 
 #define BOT_GAME_RESULT(number) std::string("The Number is: " + number)
 
 #define BOT_LEAVE() std::string("BYE BYE!")
+
+#define BOT_YOU_WIN(nick, exp) std::string(nick + " you win " + exp + " exp! Congrats!")
+#define BOT_DRAW(nick, exp) std::string(nick + " it's draw, you win " + exp + " exp!")
+#define BOT_YOU_LOSE(nick) std::string(nick + " you lose!")
+
+#define BOT_ERRO(nick, choise) std::string(nick + " the " + choise + " isn't a good input! See !help command.")
 
 #endif

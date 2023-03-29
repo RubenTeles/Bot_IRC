@@ -6,14 +6,15 @@
 #    By: rteles <rteles@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/02/02 23:25:53 by rteles            #+#    #+#              #
-#    Updated: 2023/03/23 17:28:21 by rteles           ###   ########.fr        #
+#    Updated: 2023/03/29 15:18:33 by rteles           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME			= Bot
 
 SRCS			= 	./main.cpp \
-					./Bot.cpp
+					./Bot.cpp \
+					./Game.cpp
 
 SRCS_OBJS		= $(SRCS:.cpp=.o)
 

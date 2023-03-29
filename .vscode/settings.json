@@ -50,6 +50,7 @@
         "typeinfo": "cpp",
         "csignal": "cpp",
         "numbers": "cpp",
-        "map": "cpp"
+        "map": "cpp",
+        "list": "cpp"
     }
 }

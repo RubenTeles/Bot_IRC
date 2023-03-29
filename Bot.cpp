@@ -6,7 +6,7 @@
 /*   By: rteles <rteles@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/22 16:39:47 by rteles            #+#    #+#             */
-/*   Updated: 2023/03/28 17:42:35 by rteles           ###   ########.fr       */
+/*   Updated: 2023/03/29 18:10:25 by rteles           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -125,8 +125,7 @@ void Bot::run(void)
 		}
 	
 	}
-	sendMessage("QUIT :", BOT_LEAVE());
-	close(_socket);
+	this->quit();
 }
 
 void Bot::quit(void)
@@ -207,7 +206,7 @@ rteles!rteles@localhost PRIVMSG #public :Hello
 	callBack = message;
 
 	//	------ Message -------	
-	//std::cout << message << std::endl;
+	std::cout << callBack << std::endl;
 	
 	if (message.find("Hello") != std::string::npos ||
 		message.find("hello") != std::string::npos)
@@ -220,7 +219,8 @@ rteles!rteles@localhost PRIVMSG #public :Hello
 			message.find("!Game") != std::string::npos ||
 			message.find("!GAME") != std::string::npos)
 	{
-		std::srand(time(NULL));
+		game(user, channel, message, "JanKenPo", "rock");
+		/*std::srand(time(NULL));
 		int random = (1 + (std::rand() % 10));
 		
 		callBack = BOT_GAME();
@@ -234,7 +234,13 @@ rteles!rteles@localhost PRIVMSG #public :Hello
     	stream << random;
     	std::string nbr = stream.str();
 		
-		callBack = BOT_GAME_RESULT(nbr);
+		callBack = BOT_GAME_RESULT(nbr);*/
+		return ;
+	}
+	else if (message.find("!leaderboard") != std::string::npos)
+	{
+		callBack = showLeaderBoard();
+		channel = "";
 	}
 	else
 		return ;
@@ -324,18 +330,16 @@ PRIVMSG alice :Oi, estou bem! E você?
     std::cout << "data: " << data << std::endl;
 */
 
-std::map<std::string, int> &Bot::addClient(std::string nick)
-{
-	bool isExiste = false;
-	
-	if (!_clients[nick].empty())
-		return _clients[nick];
+std::map<std::string, int> &Bot::addPlayer(std::string nick)
+{	
+	if (!_players[nick].empty())
+		return _players[nick];
 
-    std::map<std::string, int> client;
+    std::map<std::string, int> player;
 
-	client["EXP"] = 0;
-	client["WIN"] = 0;
-	client["LEVEL"] = 1;
+	player["EXP"] = 0;
+	player["WIN"] = 0;
+	player["LEVEL"] = 1;
 	
    // std::map<std::string, int> map_aux;
    
@@ -343,55 +347,63 @@ std::map<std::string, int> &Bot::addClient(std::string nick)
     map_aux.insert(std::make_pair("LEVEL", 1));
     map_aux.insert(std::make_pair("WIN", 0));*/
 
-	_clients[nick] = client;
+	_players[nick] = player;
 	
-	return _clients[nick];
+	return _players[nick];
 }
 
-void	Bot::setClient(std::string nick, bool isWin, int exp)
+void	Bot::setPlayer(std::string nick, bool isWin, int exp)
 {
 	if (nick == _name)
 		return ;
 
-	std::map<std::string, int> client = this->addClient(nick);
+	std::map<std::string, int> player = this->addPlayer(nick);
 
-	client["EXP"] += exp;
-	client["WIN"] += isWin ? 1 : 0;
+	player["EXP"] += exp;
+	player["WIN"] += isWin ? 1 : 0;
 
-	if (client["EXP"] >= client["LEVEL"] * 100)
+	if (player["EXP"] >= player["LEVEL"] * 100)
 	{
-		client["EXP"] -= client["LEVEL"] * 100;
-		client["LEVEL"] += 1;
-		std::cout << nick << " up for Level " << client["LEVEL"] << "!" << std::endl;
+		player["EXP"] -= player["LEVEL"] * 100;
+		player["LEVEL"] += 1;
+		std::cout << nick << " up for Level " << player["LEVEL"] << "!" << std::endl;
+
+		debug("LEVEL UP!", nick + " up for Level " + convertToInt(player["LEVEL"]) + "!", nick, "");
 	}
 
-	_clients[nick] = client;
+	_players[nick] = player;
 }
 
-void	Bot::leaderBoard(void)
+std::string	Bot::showLeaderBoard(void)
 {
 	std::map<std::string, std::map<std::string, int> >::iterator it;
+   	std::vector<int> 	board;
+	std::string		leaderBoard = "------ LEADER BOARD ------\n";
 	
-   	std::list<int> board;
-	
-    std::cout << "Clients: " << this->_clients.size() << std::endl;
-
-    for (it = this->_clients.begin(); it != this->_clients.end(); ++it) 
+    for (it = this->_players.begin(); it != this->_players.end(); ++it) 
     {
-		board.push_back((it->second["LEVEL"] * 100) + it->second["EXP"]);
+		if (std::find(board.begin(), board.end(), (it->second["LEVEL"] * 100) + it->second["EXP"]) == board.end())
+			board.push_back((it->second["LEVEL"] * 100) + it->second["EXP"]);
 	}
 	
-	board.sort();
+	std::sort(board.begin(), board.end());
+	std::reverse(board.begin(),board.end());
 
-	std::list<int>::iterator list_it;
+	std::vector<int>::iterator vector_it;
 	int i = 1;
-	for (list_it = board.begin(); list_it != board.end(); ++list_it) 
+	for (vector_it = board.begin(); vector_it != board.end(); ++vector_it) 
     {
-		for (it = this->_clients.begin(); it != this->_clients.end(); ++it) 
+		for (it = this->_players.begin(); it != this->_players.end(); ++it) 
     	{
-			if (*list_it == (it->second["LEVEL"] * 100) + it->second["EXP"])
-				std::cout << i << "º - " << it->first << " (LVL: " << it->second["LEVEL"] << ", EXP: " << it->second["EXP"] << std::endl;	
+    		std::string pos = convertToInt(i);
+			if (*vector_it == (it->second["LEVEL"] * 100) + it->second["EXP"])
+			{
+ 				std::string aux = pos + "º " + it->first + " (LVL: " + convertToInt(it->second["LEVEL"]) + ", EXP: " + convertToInt(it->second["EXP"]) + "/" +  convertToInt(it->second["LEVEL"] * 100) + ")";
+				std::cout << i << "º - " << it->first << " (LVL: " << it->second["LEVEL"] << ", EXP: " << it->second["EXP"] << "/" <<  it->second["LEVEL"] * 100 << ")" << std::endl;	
+				leaderBoard += aux + "\n";
+			}
 		}
 		i++;
 	}
+	return leaderBoard;
 }
