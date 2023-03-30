@@ -6,7 +6,7 @@
 /*   By: rteles <rteles@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/22 16:39:47 by rteles            #+#    #+#             */
-/*   Updated: 2023/03/30 16:00:16 by rteles           ###   ########.fr       */
+/*   Updated: 2023/03/30 16:03:03 by rteles           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,8 +28,6 @@ void	Bot::rockPapperScissors(std::string nick, std::string choise, Game *game)
 {
 	std::string result;
 	int			input = 0;
-	/*std::srand(time(NULL));
-	int random = 1 + (std::rand() % 3);*/
 	int random = game->getResult();
 	
 	if (choise.find("rock") != std::string::npos)
@@ -59,8 +57,6 @@ void	Bot::rockPapperScissors(std::string nick, std::string choise, Game *game)
 void Bot::guessNumber(std::string nick, std::string choise, Game *game)
 {
 	std::string result = "";
-	/*std::srand(time(NULL));
-	int random = (1 + (std::rand() % 10));*/
 	int random = game->getResult();
     std::istringstream iss(choise);
 	int input;
@@ -156,7 +152,6 @@ std::string	Bot::winners(std::string room)
 		usleep(100);
 	}
 
-	//APENAS PARA OS GRUPOS
 	if (game->getGame() == GUESS)
 		debug("", BOT_GAME_RESULT(convertToString(game->getResult()), convertToString(winners.size())), "", room);
 	else
@@ -167,7 +162,6 @@ std::string	Bot::winners(std::string room)
 	std::cout << "\033[35mDELETE GAME ROOM: " << garbage << "\033[0m" << std::endl;
 
 	return garbage;
-	//_games.erase(room);
 }
 
 void	Bot::gameTime(void)

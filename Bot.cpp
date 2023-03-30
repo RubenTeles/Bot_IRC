@@ -6,7 +6,7 @@
 /*   By: rteles <rteles@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/22 16:39:47 by rteles            #+#    #+#             */
-/*   Updated: 2023/03/30 15:34:49 by rteles           ###   ########.fr       */
+/*   Updated: 2023/03/30 16:06:49 by rteles           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,8 +43,6 @@ _name(name), _hostname(host), _port(port), _password(password)
   	pollEvents[0].events = POLLIN;
 	//pollEvents[1].fd = host_connect;
   	//pollEvents[1].events = POLLIN;
-	//close(_socket);
-	//close(host_connect);
 }
 
 Bot::Bot( Bot const & src)
@@ -113,7 +111,7 @@ void Bot::run(void)
 {
 	this->authenticate();
 
-	int	timeout = 1000; // 1second
+	int	timeout = 1000;// 1 second
 	int	poll_response;
     while (true)
     {
@@ -128,12 +126,12 @@ void Bot::run(void)
 			gameTime();
 		else
 		{
-			if (pollEvents[0].revents & POLLHUP) //Quando encerra a conexao
+			if (pollEvents[0].revents & POLLHUP) //When disconnect
 			{
-				std::cout << this->_name << " a Encerrar..." << std::endl;
+				std::cout << this->_name << " disconnect..." << std::endl;
         		break ;
 			}
-			if (pollEvents[0].revents & POLLIN) //recebeu um comando
+			if (pollEvents[0].revents & POLLIN) //Recive a command
 			{
 				if (this->recive() == 1)
 					break ;
@@ -141,11 +139,6 @@ void Bot::run(void)
 				pollEvents[0].revents = 0;
 			}	
 		}
-		/*if (poll(pollEvents, 1, -1) < 0) //poll
-		{
-			delete this;
-			throw std::runtime_error("Erro: Waiting for Events!");
-		}*/
 	}
 	this->quit();
 }
@@ -184,26 +177,26 @@ int	Bot::recive(void)
 }
 
 /*
-Prefixo: :alice!user@example.com
+Prefixo: :rteles!rteles@localhost
 Comando: PRIVMSG
-Parâmetro 1: #general
+Parâmetro 1: #public
 Parâmetro 2: Oi, como você está?
 //Envio:
 
-PRIVMSG #general :Oi, estou bem! E você?
+PRIVMSG #public :Oi, estou bem! E você?
 		ou
-PRIVMSG alice :Oi, estou bem! E você?
+PRIVMSG rteles :Oi, estou bem! E você?
 */
 void	Bot::privateMessage(std::string message)
 {
 /*
 rteles!rteles@localhost PRIVMSG #public :Hello
-:alice!user@example.com PRIVMSG meu_bot :Hello, como você está?
-:alice!user@example.com PRIVMSG meu_bot :!help
-:alice!user@example.com PRIVMSG #general meu_bot :!help
-:alice!user@example.com PRIVMSG meu_bot :!game
-:alice!user@example.com PRIVMSG meu_bot :sad
-:alice!user@example.com PRIVMSG #general meu_bot :!game
+rteles!rteles@localhost PRIVMSG meu_bot :Hello, como você está?
+rteles!rteles@localhost PRIVMSG meu_bot :!help
+rteles!rteles@localhost PRIVMSG #general meu_bot :!help
+rteles!rteles@localhost PRIVMSG meu_bot :!game
+rteles!rteles@localhost PRIVMSG meu_bot :sad
+rteles!rteles@localhost PRIVMSG #general meu_bot :!game
 */
 	std::string		user = "";
 	std::string		channel = "";
@@ -301,40 +294,6 @@ int	Bot::response(std::string message)
 	}
 	return 0;
 }
-/*
-//Recebo:
-:alice!user@example.com PRIVMSG meu_bot :Oi, como você está?
-
-Prefixo: :alice!user@example.com
-Comando: PRIVMSG
-Parâmetro 1: #general
-Parâmetro 2: Oi, como você está?
-
-//Envio:
-
-PRIVMSG #general :Oi, estou bem! E você?
-		ou
-PRIVMSG alice :Oi, estou bem! E você?
-*/
-
-/*
-    std::string user = "";
-    int         send_fd = -1;
-    std::string message = "PRIVMSG ";
-
-    user = data.substr(0, data.find_first_of(SPACES, 0));
-    
-    if (user.empty())
-        return ;
-    
-    message = "PRIVMSG " + user + " ";
-    std::cout << "User: " << user << std::endl;
-    std::cout << "message: " << message << std::endl;
-    
-	data = &data[user.size()];
-	data = trim(data);
-    std::cout << "data: " << data << std::endl;
-*/
 
 std::map<std::string, int> &Bot::addPlayer(std::string nick)
 {	
