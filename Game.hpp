@@ -6,13 +6,12 @@
 /*   By: rteles <rteles@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/30 01:00:29 by rteles            #+#    #+#             */
-/*   Updated: 2023/03/30 15:41:45 by rteles           ###   ########.fr       */
+/*   Updated: 2023/03/30 16:08:03 by rteles           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <iostream>
 #include <vector>
-#include <ctime>
 
 class Game
 {

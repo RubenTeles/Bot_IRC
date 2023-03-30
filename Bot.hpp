@@ -6,7 +6,7 @@
 /*   By: rteles <rteles@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/22 16:39:44 by rteles            #+#    #+#             */
-/*   Updated: 2023/03/30 15:39:20 by rteles           ###   ########.fr       */
+/*   Updated: 2023/03/30 16:07:56 by rteles           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,6 @@
 #include <map>
 #include <algorithm>
 #include <vector>
-#include <ctime>
 #include "Msg.hpp"
 #include "Game.hpp"
 
