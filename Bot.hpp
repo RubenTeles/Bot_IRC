@@ -6,7 +6,7 @@
 /*   By: rteles <rteles@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/22 16:39:44 by rteles            #+#    #+#             */
-/*   Updated: 2023/03/29 18:16:56 by rteles           ###   ########.fr       */
+/*   Updated: 2023/03/30 16:07:56 by rteles           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,12 @@
 #include <algorithm>
 #include <vector>
 #include "Msg.hpp"
+#include "Game.hpp"
+
+enum Type_Game{
+  JANKENPO,
+  GUESS,  
+};
 
 #define BUFFER_SIZE 1024
 
@@ -39,6 +45,7 @@ class Bot
         int			_socket;
 		pollfd		*pollEvents;
         std::map<std::string, std::map<std::string, int> > _players;
+        std::map<std::string, Game *>                      _games;
 
         Bot(void);
 
@@ -61,16 +68,19 @@ class Bot
         void    quit(void);
 
         //Games
-        void        game(std::string user, std::string channel, std::string message, std::string game, std::string choise);
-        std::string	rockPapperScissors(std::string nick, std::string choise);
-        std::string guessNumber(std::string nick, std::string choise);
+        void        gamePlay(std::string user, std::string channel, std::string message, std::string game);
+        void	    gameTime(void);
+        void	    rockPapperScissors(std::string nick, std::string choise, Game *game);
+        void        guessNumber(std::string nick, std::string choise, Game *game);
+        Game	    *addGame(std::string room, int game, int time, int reward, int result);
+        std::string winners(std::string room);
 
         //Player [EXP]
         std::map<std::string, int>  &addPlayer(std::string nick);
         void                        setPlayer(std::string nick, bool isWin, int exp);
         std::string                 showLeaderBoard(void);
 
-        std::string convertToInt(int input)
+        std::string convertToString(int input)
         {
             std::ostringstream stream;
             

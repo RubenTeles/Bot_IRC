@@ -6,7 +6,7 @@
 /*   By: rteles <rteles@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/22 16:39:47 by rteles            #+#    #+#             */
-/*   Updated: 2023/03/30 00:46:17 by rteles           ###   ########.fr       */
+/*   Updated: 2023/03/30 16:11:49 by rteles           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,8 +43,6 @@ _name(name), _hostname(host), _port(port), _password(password)
   	pollEvents[0].events = POLLIN;
 	//pollEvents[1].fd = host_connect;
   	//pollEvents[1].events = POLLIN;
-	//close(_socket);
-	//close(host_connect);
 }
 
 Bot::Bot( Bot const & src)
@@ -92,38 +90,55 @@ void Bot::sendMessage(std::string const command, std::string const message)
 
 void Bot::debug(std::string message, std::string callBack, std::string user, std::string channel)
 {
+	if (callBack.empty())
+	{
+		std::cout << "GIVE A VALOR TO CALLBACK!" << std::endl;
+		return ;
+	}
+
 	if (channel.empty())
 		sendMessage("PRIVMSG " + user + " :", callBack);
 	else
 		sendMessage("PRIVMSG " + channel + " :", callBack);
 
-	std::cout << "\033[32m[" << user << "] \033[0m" << message;
+	if (!message.empty())
+		std::cout << "\033[32m[" << user << "] \033[0m" << message;
+
 	std::cout << "\033[38;2;255;165;0m[" << this->_name << "] \033[0m" << callBack << std::endl;
 }
 
 void Bot::run(void)
 {
 	this->authenticate();
+
+	int	timeout = 1000;// 1 second
+	int	poll_response;
     while (true)
     {
-        if (poll(pollEvents, 1, -1) < 0) //poll
+		poll_response = poll(pollEvents, 1, timeout);
+
+		if (poll_response < 0)
 		{
 			delete this;
 			throw std::runtime_error("Erro: Waiting for Events!");
 		}
-		if (pollEvents[0].revents & POLLHUP) //Quando encerra a conexao
+		else if (poll_response == 0 && _games.size())
+			gameTime();
+		else
 		{
-			std::cout << this->_name << " a Encerrar..." << std::endl;
-        	break ;
+			if (pollEvents[0].revents & POLLHUP) //When disconnect
+			{
+				std::cout << this->_name << " disconnect..." << std::endl;
+        		break ;
+			}
+			if (pollEvents[0].revents & POLLIN) //Recive a command
+			{
+				if (this->recive() == 1)
+					break ;
+				pollEvents[0].events = POLLIN | POLLHUP;
+				pollEvents[0].revents = 0;
+			}	
 		}
-		if (pollEvents[0].revents & POLLIN) //recebeu um comando
-		{
-			if (this->recive() == 1)
-				break ;
-			pollEvents[0].events = POLLIN | POLLHUP;
-			pollEvents[0].revents = 0;
-		}
-	
 	}
 	this->quit();
 }
@@ -162,26 +177,26 @@ int	Bot::recive(void)
 }
 
 /*
-Prefixo: :alice!user@example.com
+Prefixo: :rteles!rteles@localhost
 Comando: PRIVMSG
-Parâmetro 1: #general
+Parâmetro 1: #public
 Parâmetro 2: Oi, como você está?
 //Envio:
 
-PRIVMSG #general :Oi, estou bem! E você?
+PRIVMSG #public :Oi, estou bem! E você?
 		ou
-PRIVMSG alice :Oi, estou bem! E você?
+PRIVMSG rteles :Oi, estou bem! E você?
 */
 void	Bot::privateMessage(std::string message)
 {
 /*
 rteles!rteles@localhost PRIVMSG #public :Hello
-:alice!user@example.com PRIVMSG meu_bot :Hello, como você está?
-:alice!user@example.com PRIVMSG meu_bot :!help
-:alice!user@example.com PRIVMSG #general meu_bot :!help
-:alice!user@example.com PRIVMSG meu_bot :!game
-:alice!user@example.com PRIVMSG meu_bot :sad
-:alice!user@example.com PRIVMSG #general meu_bot :!game
+rteles!rteles@localhost PRIVMSG meu_bot :Hello, como você está?
+rteles!rteles@localhost PRIVMSG meu_bot :!help
+rteles!rteles@localhost PRIVMSG #general meu_bot :!help
+rteles!rteles@localhost PRIVMSG meu_bot :!game
+rteles!rteles@localhost PRIVMSG meu_bot :sad
+rteles!rteles@localhost PRIVMSG #general meu_bot :!game
 */
 	std::string		user = "";
 	std::string		channel = "";
@@ -218,8 +233,7 @@ rteles!rteles@localhost PRIVMSG #public :Hello
 			callBack.find("!Game") != std::string::npos ||
 			callBack.find("!GAME") != std::string::npos)
 	{
-		game(user, channel, message, callBack.substr(callBack.find("!game")+5, callBack.size()).c_str(), "rock");
-		
+		this->gamePlay(user, channel, message, callBack.substr(callBack.find("!game")+5, callBack.size()).c_str());
 		return ;
 	}
 	else if (callBack.find("!leaderboard") != std::string::npos)
@@ -257,7 +271,6 @@ int	Bot::response(std::string message)
 		{
 			if (message == "com^Dman^Dd") //TODO
 			{
-				std::cout << "aqui" << std::endl;
 				return 1;
 			}
 			if (message.find(":Password incorrect") != std::string::npos && message.find("464") != std::string::npos)
@@ -280,40 +293,6 @@ int	Bot::response(std::string message)
 	}
 	return 0;
 }
-/*
-//Recebo:
-:alice!user@example.com PRIVMSG meu_bot :Oi, como você está?
-
-Prefixo: :alice!user@example.com
-Comando: PRIVMSG
-Parâmetro 1: #general
-Parâmetro 2: Oi, como você está?
-
-//Envio:
-
-PRIVMSG #general :Oi, estou bem! E você?
-		ou
-PRIVMSG alice :Oi, estou bem! E você?
-*/
-
-/*
-    std::string user = "";
-    int         send_fd = -1;
-    std::string message = "PRIVMSG ";
-
-    user = data.substr(0, data.find_first_of(SPACES, 0));
-    
-    if (user.empty())
-        return ;
-    
-    message = "PRIVMSG " + user + " ";
-    std::cout << "User: " << user << std::endl;
-    std::cout << "message: " << message << std::endl;
-    
-	data = &data[user.size()];
-	data = trim(data);
-    std::cout << "data: " << data << std::endl;
-*/
 
 std::map<std::string, int> &Bot::addPlayer(std::string nick)
 {	
@@ -326,12 +305,6 @@ std::map<std::string, int> &Bot::addPlayer(std::string nick)
 	player["WIN"] = 0;
 	player["LEVEL"] = 1;
 	
-   // std::map<std::string, int> map_aux;
-   
-    /*map_aux.insert(std::make_pair("EXP", 0));
-    map_aux.insert(std::make_pair("LEVEL", 1));
-    map_aux.insert(std::make_pair("WIN", 0));*/
-
 	_players[nick] = player;
 	
 	return _players[nick];
@@ -353,7 +326,7 @@ void	Bot::setPlayer(std::string nick, bool isWin, int exp)
 		player["LEVEL"] += 1;
 		std::cout << nick << " up for Level " << player["LEVEL"] << "!" << std::endl;
 
-		debug("LEVEL UP!", nick + " up for Level " + convertToInt(player["LEVEL"]) + "!", nick, "");
+		debug("LEVEL UP!\n", nick + " up for Level " + convertToString(player["LEVEL"]) + "!", nick, "");
 	}
 
 	_players[nick] = player;
@@ -380,10 +353,10 @@ std::string	Bot::showLeaderBoard(void)
     {
 		for (it = this->_players.begin(); it != this->_players.end(); ++it) 
     	{
-    		std::string pos = convertToInt(i);
+    		std::string pos = convertToString(i);
 			if (*vector_it == (it->second["LEVEL"] * 100) + it->second["EXP"])
 			{
- 				std::string aux = pos + "º " + it->first + " (LVL: " + convertToInt(it->second["LEVEL"]) + ", EXP: " + convertToInt(it->second["EXP"]) + "/" +  convertToInt(it->second["LEVEL"] * 100) + ")";
+ 				std::string aux = pos + "º " + it->first + " (LVL: " + convertToString(it->second["LEVEL"]) + ", EXP: " + convertToString(it->second["EXP"]) + "/" +  convertToString(it->second["LEVEL"] * 100) + ")";
 				std::cout << i << "º - " << it->first << " (LVL: " << it->second["LEVEL"] << ", EXP: " << it->second["EXP"] << "/" <<  it->second["LEVEL"] * 100 << ")" << std::endl;	
 				leaderBoard += aux + "\n";
 			}
