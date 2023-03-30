@@ -6,7 +6,7 @@
 /*   By: rteles <rteles@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/22 16:39:47 by rteles            #+#    #+#             */
-/*   Updated: 2023/03/30 00:46:17 by rteles           ###   ########.fr       */
+/*   Updated: 2023/03/30 03:20:41 by rteles           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,7 +123,6 @@ void Bot::run(void)
 			pollEvents[0].events = POLLIN | POLLHUP;
 			pollEvents[0].revents = 0;
 		}
-	
 	}
 	this->quit();
 }
@@ -218,8 +217,7 @@ rteles!rteles@localhost PRIVMSG #public :Hello
 			callBack.find("!Game") != std::string::npos ||
 			callBack.find("!GAME") != std::string::npos)
 	{
-		game(user, channel, message, callBack.substr(callBack.find("!game")+5, callBack.size()).c_str(), "rock");
-		
+		this->gamePlay(user, channel, message, callBack.substr(callBack.find("!game")+5, callBack.size()).c_str());
 		return ;
 	}
 	else if (callBack.find("!leaderboard") != std::string::npos)
@@ -241,6 +239,9 @@ int	Bot::response(std::string message)
 	std::string		command = "";
 	std::string		value;
 	std::string		callBack = "";
+
+	if (_games.size() > 0)
+		gameTime();
 
 	if (message.find("PING") == 0)
 	{
@@ -325,13 +326,8 @@ std::map<std::string, int> &Bot::addPlayer(std::string nick)
 	player["EXP"] = 0;
 	player["WIN"] = 0;
 	player["LEVEL"] = 1;
+	player["IN_GAME"] = 0;
 	
-   // std::map<std::string, int> map_aux;
-   
-    /*map_aux.insert(std::make_pair("EXP", 0));
-    map_aux.insert(std::make_pair("LEVEL", 1));
-    map_aux.insert(std::make_pair("WIN", 0));*/
-
 	_players[nick] = player;
 	
 	return _players[nick];
@@ -353,7 +349,7 @@ void	Bot::setPlayer(std::string nick, bool isWin, int exp)
 		player["LEVEL"] += 1;
 		std::cout << nick << " up for Level " << player["LEVEL"] << "!" << std::endl;
 
-		debug("LEVEL UP!", nick + " up for Level " + convertToInt(player["LEVEL"]) + "!", nick, "");
+		debug("LEVEL UP!", nick + " up for Level " + convertToString(player["LEVEL"]) + "!", nick, "");
 	}
 
 	_players[nick] = player;
@@ -380,10 +376,10 @@ std::string	Bot::showLeaderBoard(void)
     {
 		for (it = this->_players.begin(); it != this->_players.end(); ++it) 
     	{
-    		std::string pos = convertToInt(i);
+    		std::string pos = convertToString(i);
 			if (*vector_it == (it->second["LEVEL"] * 100) + it->second["EXP"])
 			{
- 				std::string aux = pos + "º " + it->first + " (LVL: " + convertToInt(it->second["LEVEL"]) + ", EXP: " + convertToInt(it->second["EXP"]) + "/" +  convertToInt(it->second["LEVEL"] * 100) + ")";
+ 				std::string aux = pos + "º " + it->first + " (LVL: " + convertToString(it->second["LEVEL"]) + ", EXP: " + convertToString(it->second["EXP"]) + "/" +  convertToString(it->second["LEVEL"] * 100) + ")";
 				std::cout << i << "º - " << it->first << " (LVL: " << it->second["LEVEL"] << ", EXP: " << it->second["EXP"] << "/" <<  it->second["LEVEL"] * 100 << ")" << std::endl;	
 				leaderBoard += aux + "\n";
 			}
