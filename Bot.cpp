@@ -6,7 +6,7 @@
 /*   By: rteles <rteles@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/22 16:39:47 by rteles            #+#    #+#             */
-/*   Updated: 2023/03/30 16:06:49 by rteles           ###   ########.fr       */
+/*   Updated: 2023/03/30 16:11:49 by rteles           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -271,7 +271,6 @@ int	Bot::response(std::string message)
 		{
 			if (message == "com^Dman^Dd") //TODO
 			{
-				std::cout << "aqui" << std::endl;
 				return 1;
 			}
 			if (message.find(":Password incorrect") != std::string::npos && message.find("464") != std::string::npos)
@@ -305,7 +304,6 @@ std::map<std::string, int> &Bot::addPlayer(std::string nick)
 	player["EXP"] = 0;
 	player["WIN"] = 0;
 	player["LEVEL"] = 1;
-	player["IN_GAME"] = 0;
 	
 	_players[nick] = player;
 	
