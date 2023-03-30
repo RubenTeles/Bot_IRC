@@ -6,7 +6,7 @@
 /*   By: rteles <rteles@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/22 16:39:47 by rteles            #+#    #+#             */
-/*   Updated: 2023/03/30 16:11:49 by rteles           ###   ########.fr       */
+/*   Updated: 2023/03/30 16:21:30 by rteles           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -269,7 +269,7 @@ int	Bot::response(std::string message)
 			this->privateMessage(message);
 		else
 		{
-			if (message == "com^Dman^Dd") //TODO
+			if (message.find("com^Dman^Dd") == 0) //TODO
 			{
 				return 1;
 			}
