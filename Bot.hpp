@@ -6,7 +6,7 @@
 /*   By: rteles <rteles@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/22 16:39:44 by rteles            #+#    #+#             */
-/*   Updated: 2023/03/30 02:57:58 by rteles           ###   ########.fr       */
+/*   Updated: 2023/03/30 11:59:55 by rteles           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,7 +73,7 @@ class Bot
         void	    gameTime(void);
         void	    rockPapperScissors(std::string nick, std::string choise, Game *game);
         void        guessNumber(std::string nick, std::string choise, Game *game);
-        Game	    *addGame(std::string room, int game, int time, int result, int reward);
+        Game	    *addGame(std::string room, int game, int time, int reward);
         void        winners(std::string room);
 
         //Player [EXP]

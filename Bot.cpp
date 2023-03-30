@@ -6,7 +6,7 @@
 /*   By: rteles <rteles@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/22 16:39:47 by rteles            #+#    #+#             */
-/*   Updated: 2023/03/30 03:20:41 by rteles           ###   ########.fr       */
+/*   Updated: 2023/03/30 11:53:49 by rteles           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,6 +97,9 @@ void Bot::debug(std::string message, std::string callBack, std::string user, std
 	else
 		sendMessage("PRIVMSG " + channel + " :", callBack);
 
+	if (message.empty())
+		message = "\n";
+
 	std::cout << "\033[32m[" << user << "] \033[0m" << message;
 	std::cout << "\033[38;2;255;165;0m[" << this->_name << "] \033[0m" << callBack << std::endl;
 }
@@ -106,7 +109,12 @@ void Bot::run(void)
 	this->authenticate();
     while (true)
     {
-        if (poll(pollEvents, 1, -1) < 0) //poll
+		/*if (_games.size() > 0)
+		{
+			gameTime();
+		}
+        else */
+		if (poll(pollEvents, 1, -1) < 0) //poll
 		{
 			delete this;
 			throw std::runtime_error("Erro: Waiting for Events!");
