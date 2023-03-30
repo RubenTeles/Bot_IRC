@@ -6,7 +6,7 @@
 /*   By: rteles <rteles@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/30 01:00:29 by rteles            #+#    #+#             */
-/*   Updated: 2023/03/30 11:58:35 by rteles           ###   ########.fr       */
+/*   Updated: 2023/03/30 15:41:45 by rteles           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,12 +25,12 @@ class Game
         std::vector<std::string>    _draws;
         std::vector<std::string>    _losers;
         std::string                 _vitory;
-        int                         _result;
         int                         _reward;
+        int                         _result;
         Game();
 
     public:
-        Game(std::string room, int game, int time, int reward);
+        Game(std::string room, int game, int time, int reward, int result);
         ~Game();
 
         int                         getGame(void) const{ return _game; }
@@ -45,6 +45,9 @@ class Game
         std::string                 getVictory(void) const{ return _vitory; }
         void                        setResult(int result) { _result = result; }
         void                        setVitory(std::string vitory) { _vitory = vitory; }
+        void                        setTime(int time) {
+            if (_time > 0)
+                _time -= time; }
         void                        setWinnerOrLosser(std::string player, int win)
         {     
             std::vector<std::string>::iterator vector_it;

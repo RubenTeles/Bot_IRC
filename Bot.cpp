@@ -6,7 +6,7 @@
 /*   By: rteles <rteles@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/22 16:39:47 by rteles            #+#    #+#             */
-/*   Updated: 2023/03/30 11:53:49 by rteles           ###   ########.fr       */
+/*   Updated: 2023/03/30 15:34:49 by rteles           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,45 +92,60 @@ void Bot::sendMessage(std::string const command, std::string const message)
 
 void Bot::debug(std::string message, std::string callBack, std::string user, std::string channel)
 {
+	if (callBack.empty())
+	{
+		std::cout << "GIVE A VALOR TO CALLBACK!" << std::endl;
+		return ;
+	}
+
 	if (channel.empty())
 		sendMessage("PRIVMSG " + user + " :", callBack);
 	else
 		sendMessage("PRIVMSG " + channel + " :", callBack);
 
-	if (message.empty())
-		message = "\n";
+	if (!message.empty())
+		std::cout << "\033[32m[" << user << "] \033[0m" << message;
 
-	std::cout << "\033[32m[" << user << "] \033[0m" << message;
 	std::cout << "\033[38;2;255;165;0m[" << this->_name << "] \033[0m" << callBack << std::endl;
 }
 
 void Bot::run(void)
 {
 	this->authenticate();
+
+	int	timeout = 1000; // 1second
+	int	poll_response;
     while (true)
     {
-		/*if (_games.size() > 0)
-		{
-			gameTime();
-		}
-        else */
-		if (poll(pollEvents, 1, -1) < 0) //poll
+		poll_response = poll(pollEvents, 1, timeout);
+
+		if (poll_response < 0)
 		{
 			delete this;
 			throw std::runtime_error("Erro: Waiting for Events!");
 		}
-		if (pollEvents[0].revents & POLLHUP) //Quando encerra a conexao
+		else if (poll_response == 0 && _games.size())
+			gameTime();
+		else
 		{
-			std::cout << this->_name << " a Encerrar..." << std::endl;
-        	break ;
+			if (pollEvents[0].revents & POLLHUP) //Quando encerra a conexao
+			{
+				std::cout << this->_name << " a Encerrar..." << std::endl;
+        		break ;
+			}
+			if (pollEvents[0].revents & POLLIN) //recebeu um comando
+			{
+				if (this->recive() == 1)
+					break ;
+				pollEvents[0].events = POLLIN | POLLHUP;
+				pollEvents[0].revents = 0;
+			}	
 		}
-		if (pollEvents[0].revents & POLLIN) //recebeu um comando
+		/*if (poll(pollEvents, 1, -1) < 0) //poll
 		{
-			if (this->recive() == 1)
-				break ;
-			pollEvents[0].events = POLLIN | POLLHUP;
-			pollEvents[0].revents = 0;
-		}
+			delete this;
+			throw std::runtime_error("Erro: Waiting for Events!");
+		}*/
 	}
 	this->quit();
 }
@@ -248,9 +263,6 @@ int	Bot::response(std::string message)
 	std::string		value;
 	std::string		callBack = "";
 
-	if (_games.size() > 0)
-		gameTime();
-
 	if (message.find("PING") == 0)
 	{
 		value = message.substr(4, message.length()).c_str();
@@ -357,7 +369,7 @@ void	Bot::setPlayer(std::string nick, bool isWin, int exp)
 		player["LEVEL"] += 1;
 		std::cout << nick << " up for Level " << player["LEVEL"] << "!" << std::endl;
 
-		debug("LEVEL UP!", nick + " up for Level " + convertToString(player["LEVEL"]) + "!", nick, "");
+		debug("LEVEL UP!\n", nick + " up for Level " + convertToString(player["LEVEL"]) + "!", nick, "");
 	}
 
 	_players[nick] = player;

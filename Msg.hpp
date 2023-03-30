@@ -6,7 +6,7 @@
 /*   By: rteles <rteles@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/24 13:11:36 by rteles            #+#    #+#             */
-/*   Updated: 2023/03/30 02:12:14 by rteles           ###   ########.fr       */
+/*   Updated: 2023/03/30 16:00:08 by rteles           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ me                 defined an action\n\
 
 #define	BOT_GAME() std::string("Let's PLAY A GAME! Guess the number I'm thinking of from 1 to 10! You have 10 seconds to guess!")
 
-#define BOT_GAME_RESULT(number) std::string("The Number is: " + number)
+#define BOT_GAME_RESULT(number, winners) std::string("Result: " + number + ", we have " + winners + " winners!")
 
 #define BOT_LEAVE() std::string("BYE BYE!")
 

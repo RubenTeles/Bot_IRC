@@ -6,7 +6,7 @@
 /*   By: rteles <rteles@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/22 16:39:47 by rteles            #+#    #+#             */
-/*   Updated: 2023/03/30 12:03:02 by rteles           ###   ########.fr       */
+/*   Updated: 2023/03/30 16:00:16 by rteles           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,8 +28,9 @@ void	Bot::rockPapperScissors(std::string nick, std::string choise, Game *game)
 {
 	std::string result;
 	int			input = 0;
-	std::srand(time(NULL));
-	int random = 1 + (std::rand() % 3);
+	/*std::srand(time(NULL));
+	int random = 1 + (std::rand() % 3);*/
+	int random = game->getResult();
 	
 	if (choise.find("rock") != std::string::npos)
 		input = 1;
@@ -58,8 +59,9 @@ void	Bot::rockPapperScissors(std::string nick, std::string choise, Game *game)
 void Bot::guessNumber(std::string nick, std::string choise, Game *game)
 {
 	std::string result = "";
-	std::srand(time(NULL));
-	int random = (1 + (std::rand() % 10));
+	/*std::srand(time(NULL));
+	int random = (1 + (std::rand() % 10));*/
+	int random = game->getResult();
     std::istringstream iss(choise);
 	int input;
 
@@ -85,9 +87,9 @@ void Bot::gamePlay(std::string user, std::string channel, std::string message, s
 	if (game.find("jankenpo") != std::string::npos)
 	{
 		if (!channel.empty())
-			room_game = addGame(channel, JANKENPO, 10, 200);
+			room_game = addGame(channel, JANKENPO, 10, 200, 1 + (std::rand() % 3));
 		else
-			room_game = addGame(user, JANKENPO, 0, 200);
+			room_game = addGame(user, JANKENPO, 0, 200, 1 + (std::rand() % 3));
 		
 		rockPapperScissors(user, game.substr(game.find("jankenpo")+9, game.size()).c_str(), room_game);
 		
@@ -96,36 +98,35 @@ void Bot::gamePlay(std::string user, std::string channel, std::string message, s
 	else if (game.find("guessnumber") != std::string::npos)
 	{
 		if (!channel.empty())
-			room_game = addGame(channel, GUESS, 10, 1000);
+			room_game = addGame(channel, GUESS, 10, 1000, 1 + (std::rand() % 10));
 		else
-			room_game = addGame(user, GUESS, 0, 1000);
+			room_game = addGame(user, GUESS, 0, 1000, 1 + (std::rand() % 10));
 
 		guessNumber(user, game.substr(game.find("guessnumber")+11, game.size()).c_str(), room_game);
 		
-		room_game->setVitory(BOT_GAME_RESULT(convertInput(room_game->getResult())));
+		room_game->setVitory("The Number is: " + convertToString(room_game->getResult()));
 	}
 
-	if (room_game->getTimeLimit() == 0)
-		winners(room_game->getRoom());
 	(void)message;
 }
 
-Game	*Bot::addGame(std::string room, int game, int time, int reward)
+Game	*Bot::addGame(std::string room, int game, int time, int reward, int result)
 {
     if (!_games[room])
 	{
-		_games[room] = new Game(room, game, time, reward);
-		std::cout << "NEW GAME ROOM: " << room << std::endl;
+		_games[room] = new Game(room, game, time, reward, result);
+		std::cout << "\033[35mNEW GAME ROOM: " << room << "\033[0m" << std::endl;
 	}
-
 
 	return _games[room];
 }
 
-void	Bot::winners(std::string room)
+std::string	Bot::winners(std::string room)
 {
 	if (!_games[room])
-		return ;
+		return "";
+
+	std::string garbage = room;
 
 	Game *game = _games[room];
 	
@@ -139,43 +140,52 @@ void	Bot::winners(std::string room)
 		std::string callBack = BOT_YOU_WIN(*user, convertToString(reward)) + " " + game->getVictory();
 		debug("", callBack, *user, "");
 		setPlayer(*user, true, reward);
-		usleep(50);
+		usleep(100);
 	}
 	for (user = draws.begin(); user != draws.end(); ++user)
     {
 		std::string callBack = BOT_DRAW(*user, convertToString(50));
 		debug("", callBack, *user, "");
 		setPlayer(*user, true, 50);
-		usleep(50);
+		usleep(100);
 	}
 	for (user = losers.begin(); user != losers.end(); ++user)
     {
 		std::string callBack = BOT_YOU_LOSE(*user);
 		debug("", callBack, *user, "");
-		usleep(50);
+		usleep(100);
 	}
 
+	//APENAS PARA OS GRUPOS
 	if (game->getGame() == GUESS)
-		debug("", BOT_GAME_RESULT(convertToString(game->getResult())), "", room);
+		debug("", BOT_GAME_RESULT(convertToString(game->getResult()), convertToString(winners.size())), "", room);
+	else
+		debug("", BOT_GAME_RESULT(convertInput(game->getResult()), convertToString(winners.size())), "", room);
 
 	delete _games[room];
 
-	_games.erase(room);
+	std::cout << "\033[35mDELETE GAME ROOM: " << garbage << "\033[0m" << std::endl;
 
-	std::cout << "okey! " << _games.size() << std::endl;
+	return garbage;
+	//_games.erase(room);
 }
 
 void	Bot::gameTime(void)
 {
     std::map<std::string, Game *>::iterator it;
-	clock_t end = clock();
+	std::vector<std::string> finish_games;
 	
 	for (it = this->_games.begin(); it != this->_games.end(); ++it)
     {
-		std::cout << "START: " << (*it).second->getStartTime() << std::endl;
-		std::cout << "END: " << end << std::endl;
-		std::cout << "Time: " << (end - (*it).second->getStartTime()) / CLOCKS_PER_SEC << std::endl;
-		if ((end - (*it).second->getStartTime()) / CLOCKS_PER_SEC >= (*it).second->getTimeLimit())
-			this->winners((*it).second->getRoom());
+		(*it).second->setTime(1);
+		if ((*it).second->getTimeLimit() <= 0)
+			finish_games.push_back(this->winners((*it).second->getRoom()));
+	}
+
+    std::vector<std::string>::iterator v_it;
+	for (v_it = finish_games.begin(); v_it != finish_games.end(); ++v_it)
+	{
+		if (!(*v_it).empty())
+			_games.erase(*v_it);
 	}
 }
