@@ -6,7 +6,7 @@
 /*   By: rteles <rteles@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/22 16:39:44 by rteles            #+#    #+#             */
-/*   Updated: 2023/03/30 16:07:56 by rteles           ###   ########.fr       */
+/*   Updated: 2023/04/03 02:06:37 by rteles           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,14 +58,16 @@ class Bot
 
         Bot & operator=(Bot const & rhs);
 
-        void    authenticate(void);
-		void	run(void);
-		int 	recive(void);
-		int 	response(std::string message);
-		void	sendMessage(std::string const command, std::string const message);
-		void	privateMessage(std::string message);
-        void    debug(std::string message, std::string callBack, std::string user, std::string channel);
-        void    quit(void);
+        void        authenticate(void);
+		void	    run(void);
+		int 	    recive(void);
+		int 	    response(std::string message);
+		void	    sendMessage(std::string const command, std::string const message);
+		void	    privateMessage(std::string message);
+        void        debug(std::string message, std::string callBack, std::string user, std::string channel);
+        void        quit(void);
+        void	    welcomeChannel(std::string message);
+        void    	invite(std::string message);
 
         //Games
         void        gamePlay(std::string user, std::string channel, std::string message, std::string game);
