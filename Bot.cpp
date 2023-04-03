@@ -6,7 +6,7 @@
 /*   By: rteles <rteles@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/22 16:39:47 by rteles            #+#    #+#             */
-/*   Updated: 2023/03/30 16:11:49 by rteles           ###   ########.fr       */
+/*   Updated: 2023/04/03 02:40:42 by rteles           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -221,9 +221,9 @@ rteles!rteles@localhost PRIVMSG #general meu_bot :!game
 	if (callBack.find("Hello") != std::string::npos ||
 		callBack.find("hello") != std::string::npos)
 		callBack = BOT_HELLO(user);
-	else if (callBack.find("!help game") != std::string::npos ||
-			callBack.find("!Help Game") != std::string::npos ||
-			callBack.find("!HELP GAME") != std::string::npos)
+	else if (callBack.find("!helpgame") != std::string::npos ||
+			callBack.find("!HelpGame") != std::string::npos ||
+			callBack.find("!HELPGAME") != std::string::npos)
 		callBack = BOT_HELP_GAME();
 	else if (callBack.find("!help") != std::string::npos ||
 			callBack.find("!Help") != std::string::npos ||
@@ -240,6 +240,11 @@ rteles!rteles@localhost PRIVMSG #general meu_bot :!game
 	{
 		callBack = showLeaderBoard();
 		channel = "";
+	}
+	else if (callBack.find("!invite") != std::string::npos && !callBack.empty())
+	{
+		invite(callBack.substr(callBack.find("!invite")+8));
+		return ;
 	}
 	else
 		return ;
@@ -269,7 +274,7 @@ int	Bot::response(std::string message)
 			this->privateMessage(message);
 		else
 		{
-			if (message == "com^Dman^Dd") //TODO
+			if (message.find("com^Dman^Dd") == 0)
 			{
 				return 1;
 			}
@@ -286,6 +291,13 @@ int	Bot::response(std::string message)
 			if (message.find(":Welcome to server, "+this->_name) != std::string::npos && message.find("001") != std::string::npos)
 			{
 				std::cout << "\033[32mConnected!\033[0m" << std::endl;
+				return 0;
+			}
+			if (message.find(":"+this->_name+"!"+this->_name+"@"+this->_hostname+" JOIN #") != std::string::npos)
+			{
+				//TODO
+				std::cout << "entrou: " << message << std::endl;
+				welcomeChannel(message);
 				return 0;
 			}
 			std::cout << message << std::endl;
@@ -364,4 +376,25 @@ std::string	Bot::showLeaderBoard(void)
 		i++;
 	}
 	return leaderBoard;
+}
+
+void	Bot::invite(std::string message)
+{
+	sendMessage("JOIN #", message);
+}
+
+void	Bot::welcomeChannel(std::string message)
+{
+	//TODO
+	std::string channel = "";
+		
+	if (message.find("#") == std::string::npos)
+		return ;
+
+	channel = message.substr(message.find("#"), message.size()-2).c_str();
+	std::cout << "CHANEL: " << channel << std::endl;
+
+//	channel = "#public";
+
+	sendMessage("PRIVMSG " + channel + " :", BOT_HELLO_CHANNEL(channel, this->_name));
 }
