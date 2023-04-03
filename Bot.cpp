@@ -6,7 +6,7 @@
 /*   By: rteles <rteles@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/22 16:39:47 by rteles            #+#    #+#             */
-/*   Updated: 2023/04/03 02:40:42 by rteles           ###   ########.fr       */
+/*   Updated: 2023/04/03 14:47:02 by rteles           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,6 +86,9 @@ void Bot::sendMessage(std::string const command, std::string const message)
 	std::string	message_for_send = command + message + "\r\n";
 
 	send(this->_socket, message_for_send.c_str(), message_for_send.size(), 0);
+
+	pollEvents[0].revents = 0;
+	pollEvents[0].events = POLLIN | POLLOUT | POLLHUP;
 }
 
 void Bot::debug(std::string message, std::string callBack, std::string user, std::string channel)
@@ -172,6 +175,9 @@ int	Bot::recive(void)
 
 	if (message.empty())
 		return 0;
+
+	pollEvents[0].events = POLLIN | POLLHUP;
+	pollEvents[0].revents = 0;
 
 	return this->response(message);
 }
@@ -300,7 +306,7 @@ int	Bot::response(std::string message)
 				welcomeChannel(message);
 				return 0;
 			}
-			std::cout << message << std::endl;
+			//std::cout << message << std::endl;
 		}
 	}
 	return 0;
@@ -383,6 +389,15 @@ void	Bot::invite(std::string message)
 	sendMessage("JOIN #", message);
 }
 
+std::string trim(std::string str) 
+{
+    int length;
+    while (!str.empty()  && isspace(*str.begin()))
+        str.erase(str.begin());
+    for (length = (str.length() - 1); length >= 0 && isspace(str[length]); length--);
+    return str.substr(0, length + 1);
+}
+
 void	Bot::welcomeChannel(std::string message)
 {
 	//TODO
@@ -390,8 +405,11 @@ void	Bot::welcomeChannel(std::string message)
 		
 	if (message.find("#") == std::string::npos)
 		return ;
+	
+	std::cout << "Message: " << message << std::endl << "Depois: " << trim(message) << std::endl;
 
-	channel = message.substr(message.find("#"), message.size()-2).c_str();
+	channel = message.substr(message.find("#"), message.find(":test")).c_str();
+	channel = trim(channel);
 	std::cout << "CHANEL: " << channel << std::endl;
 
 //	channel = "#public";
