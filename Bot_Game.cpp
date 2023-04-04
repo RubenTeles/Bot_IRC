@@ -10,6 +10,16 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+/*
+This code creates a game that has 2 modes: a game of rock-paper-scissors and a guessing game.
+The rock-paper-scissors game has the computer choose a random number from 1 to 3.
+If the number the player chooses is the same as the computer's number, the player draws.
+If the number the player chooses is 1 greater than the computer's number or 2 less than the computer's number, the player wins.
+If the number the player chooses is 1 less than the computer's number or 2 greater than the computer's number, the player loses.
+The guessing game has the computer choose a random number from 1 to 10.
+If the number the player chooses is the same as the computer's number, the player wins.
+If the number the player chooses is not the same as the computer's number, the player loses.
+*/
 #include "Bot.hpp"
 
 std::string convertInput(int input)
