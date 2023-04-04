@@ -4,6 +4,8 @@ This is an IRC bot written in C++ that offers several features such as games, le
 
 This project is a Bonus for [FT_IRC](https://github.com/zico15/ft_irc), this is an IRC Server.
 
+![Screenshot from 2023-04-04 23-42-37](https://user-images.githubusercontent.com/75394884/229938356-dd23557d-837e-472e-96ad-1273be0ea873.png)
+
 ## How it works
 The bot is divided into several files, each responsible for a different part of the bot, such as connecting to the IRC server, interpreting commands, running games, maintaining the leaderboard and more.
 
