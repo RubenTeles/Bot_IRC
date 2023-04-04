@@ -341,6 +341,15 @@ int	Bot::response(std::string message)
 	return 0;
 }
 
+/*
+The function "addPlayer" takes in a string and returns a map.
+The code starts by checking if the map at the index of the given string is empty.
+If it is not, the code will return the map.
+If it is, the code will define a player variable and set it to an empty map.
+The code will then set the EXP key in the player variable to 0, the WIN key in the player variable to 0, and the LEVEL key in the player variable to 1.
+The code will then set the map at the index of the given string to the player variable.
+The code will then return the map at the index of the given string.
+*/
 std::map<std::string, int> &Bot::addPlayer(std::string nick)
 {	
 	if (!_players[nick].empty())
@@ -357,6 +366,18 @@ std::map<std::string, int> &Bot::addPlayer(std::string nick)
 	return _players[nick];
 }
 
+/*
+This function takes in a string, a boolean, and an integer.
+The code starts by checking if the given string is equal to the name of the bot.
+If it is, the code will return.
+If it is not, the code will define a player variable and set it to the result of the "addPlayer" function.
+The code will then increment the EXP key of the player variable by the given integer.
+The code will then increment the WIN key of the player variable by the given boolean.
+The code will then check if the value of the EXP key of the player variable is greater than or equal to the value of the LEVEL key of the player variable multiplied by 100.
+If the value of the EXP key of the player variable is greater than or equal to the value of the LEVEL key of the player variable multiplied by 100, the code will decrement the value of the EXP key of the player variable by the value of the LEVEL key of the player variable multiplied by 100.
+The code will then increment the value of the LEVEL key of the player variable by 1.
+The code will then set the map at the index of the given string to the player variable.
+*/
 void	Bot::setPlayer(std::string nick, bool isWin, int exp)
 {
 	if (nick == _name)
@@ -379,6 +400,22 @@ void	Bot::setPlayer(std::string nick, bool isWin, int exp)
 	_players[nick] = player;
 }
 
+/*
+This function returns a string.
+The code starts by defining 2 iterator variables.
+The code then defines a board variable and sets it to an empty vector.
+The code will then define a leaderBoard variable and set it to "------ LEADER BOARD ------".
+The code will then enter a for loop that will run for each map in the _players map.
+The code will then check if the board vector contains the value of the LEVEL key of the current map multiplied by 100 plus the value of the EXP key of the current map.
+If the board vector does not contain the value of the LEVEL key of the current map multiplied by 100 plus the value of the EXP key of the current map, the code will push the value of the LEVEL key of the current map multiplied by 100 plus the value of the EXP key of the current map to the board vector.
+The code will then sort the board vector and reverse it.
+The code will then enter another for loop that will run for each integer in the board vector.
+The code will then enter another for loop that will run for each map in the _players map.
+The code will then check if the current integer in the board vector is equal to the value of the LEVEL key of the current map multiplied by 100 plus the value of the EXP key of the current map.
+If the current integer in the board vector is equal to the value of the LEVEL key of the current map multiplied by 100 plus the value of the EXP key of the current map, the code will print the position of the player, the name of the player, the level of the player, the EXP of the player, and the EXP needed to level up.
+The code will then increment the position variable by 1.
+The code will then return the leaderBoard variable.
+*/
 std::string	Bot::showLeaderBoard(void)
 {
 	std::map<std::string, std::map<std::string, int> >::iterator it;
@@ -413,11 +450,24 @@ std::string	Bot::showLeaderBoard(void)
 	return leaderBoard;
 }
 
+/*
+This function takes in a string.
+The code starts by sending a message to the given string.
+*/
 void	Bot::invite(std::string message)
 {
 	sendMessage("JOIN #", message);
 }
 
+/*
+This function takes in a string and returns a string.
+The code starts by checking if the given string is empty.
+If it is not, the code will return the given string.
+If it is, the code will define a length variable and set it to the length of the given string minus 1.
+The code will then enter a while loop that will run until the length variable is greater than or equal to 0 and the given string at the index of the length variable is a space.
+The code will then decrement the length variable by 1.
+The code will then return the given string from the start up to the value of the length variable plus 1.
+*/
 std::string trim(std::string str) 
 {
     int length;
@@ -427,6 +477,14 @@ std::string trim(std::string str)
     return str.substr(0, length + 1);
 }
 
+/*
+This function takes in a string.
+The code starts by defining a channel variable.
+The code will then check if the given string contains "#".
+If it does not, the code will return.
+If it does, the code will set the channel variable to the given string.
+The code will then send a welcome message to the channel.
+*/
 void	Bot::welcomeChannel(std::string message)
 {
 	std::string channel = "";
