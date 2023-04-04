@@ -1,4 +1,4 @@
-# IRC Bot
+# Bot IRC
 
 This is an IRC bot written in C++ that offers several features such as games, leaderboard and user welcome. Users can interact with the bot using specific custom commands, making IRC chat more interactive and fun.
 
