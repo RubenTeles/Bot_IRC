@@ -10,6 +10,35 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+/*
+This code is a bot that interacts with a user on an IRC channel.
+The code starts by declaring the Bot class.
+The code then defines a Bot constructor that takes no parameters.
+The constructor prints "Bot Default Constructor!".
+The code then defines a Bot constructor that takes 4 parameters.
+The constructor sets the bot's name, hostname, port, and password.
+The code then defines a Bot copy constructor.
+The code then defines a Bot destructor.
+The destructor deletes the pollEvents variable and prints "Disconnected!".
+The code then defines a Bot assignment operator.
+The code then defines an authenticate function.
+The function sends a password message to the server if the password is not empty.
+The function then sends the bot's name to the server.
+The code then defines a sendMessage function that takes a command and a message.
+The function sends a message to the server.
+The code then defines a debug function that takes a message and a callback.
+The function sends the callback to the user and prints the callback.
+The code then defines a run function.
+The function authenticate the user and enters a loop that runs until the user disconnects.
+The code then defines a quit function.
+The function sends a quit message to the server and closes the socket.
+The code then defines a recive function.
+The function receives a message and responds accordingly.
+The code then defines a privateMessage function.
+The function checks if the message is a command. If it is a command, the function returns. Otherwise, the function responds accordingly.
+The code then defines a response function.
+The function checks the type of message and responds accordingly.
+*/
 #include "Bot.hpp"
 
 Bot::Bot(void)
@@ -400,7 +429,6 @@ std::string trim(std::string str)
 
 void	Bot::welcomeChannel(std::string message)
 {
-	//TODO
 	std::string channel = "";
 		
 	if (message.find("#") == std::string::npos)
@@ -411,8 +439,6 @@ void	Bot::welcomeChannel(std::string message)
 	channel = message.substr(message.find("#"), message.find(":test")).c_str();
 	channel = trim(channel);
 	std::cout << "CHANEL: " << channel << std::endl;
-
-//	channel = "#public";
 
 	sendMessage("PRIVMSG " + channel + " :", BOT_HELLO_CHANNEL(channel, this->_name));
 }
