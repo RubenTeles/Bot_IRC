@@ -6,7 +6,7 @@
 /*   By: rteles <rteles@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/22 16:39:47 by rteles            #+#    #+#             */
-/*   Updated: 2023/04/03 14:47:02 by rteles           ###   ########.fr       */
+/*   Updated: 2023/04/03 17:34:05 by rteles           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,10 @@ Bot::Bot(void)
 Bot::Bot(std::string host, char * port, std::string password, std::string name) : 
 _name(name), _hostname(host), _port(port), _password(password) 
 {
+	struct hostent *server = gethostbyname(host.c_str());
+	if (server == NULL)
+	    throw std::runtime_error("Erro: Isn't possible to resolve Hostname");
+
     struct sockaddr_in   target;
     
     _socket = socket(AF_INET, SOCK_STREAM, 0);//IPV 4, TCP
@@ -31,7 +35,7 @@ _name(name), _hostname(host), _port(port), _password(password)
 
     target.sin_family = AF_INET;
     target.sin_port = htons(atof(port));
-    target.sin_addr.s_addr = INADDR_ANY;
+	bcopy((char *)server->h_addr, (char *)&target.sin_addr.s_addr, server->h_length);
 
 	int	host_connect = connect(_socket, (struct sockaddr *)&target, sizeof(target));
     if (host_connect < 0)
@@ -301,8 +305,6 @@ int	Bot::response(std::string message)
 			}
 			if (message.find(":"+this->_name+"!"+this->_name+"@"+this->_hostname+" JOIN #") != std::string::npos)
 			{
-				//TODO
-				std::cout << "entrou: " << message << std::endl;
 				welcomeChannel(message);
 				return 0;
 			}
@@ -400,19 +402,13 @@ std::string trim(std::string str)
 
 void	Bot::welcomeChannel(std::string message)
 {
-	//TODO
 	std::string channel = "";
 		
 	if (message.find("#") == std::string::npos)
 		return ;
 	
-	std::cout << "Message: " << message << std::endl << "Depois: " << trim(message) << std::endl;
-
 	channel = message.substr(message.find("#"), message.find(":test")).c_str();
 	channel = trim(channel);
-	std::cout << "CHANEL: " << channel << std::endl;
-
-//	channel = "#public";
 
 	sendMessage("PRIVMSG " + channel + " :", BOT_HELLO_CHANNEL(channel, this->_name));
 }

@@ -6,7 +6,7 @@
 /*   By: rteles <rteles@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/22 16:39:44 by rteles            #+#    #+#             */
-/*   Updated: 2023/04/03 14:45:56 by rteles           ###   ########.fr       */
+/*   Updated: 2023/04/03 17:30:32 by rteles           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@
 #include <sys/poll.h>
 #include <sstream>
 #include <stdlib.h>
+#include <netdb.h>
 #include <map>
 #include <algorithm>
 #include <vector>

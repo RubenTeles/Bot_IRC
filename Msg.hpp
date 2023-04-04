@@ -6,7 +6,7 @@
 /*   By: rteles <rteles@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/24 13:11:36 by rteles            #+#    #+#             */
-/*   Updated: 2023/04/03 02:10:59 by rteles           ###   ########.fr       */
+/*   Updated: 2023/04/03 15:37:54 by rteles           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ list               list of channel\n\
 !game guess [1-10]                play a game \"Guess a Number\"")
 
 
-#define	BOT_GAME(game, seconds) std::string("GAME START! " + game + " You have " + " seconds to play!")
+#define	BOT_GAME(game, seconds) std::string("GAME START! " + game + " You have " + seconds + " seconds to play!")
 
 #define BOT_GAME_RESULT(number, winners) std::string("GAME END! Result: " + number + ", we have " + winners + " winners!")
 
