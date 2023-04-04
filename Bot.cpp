@@ -6,7 +6,7 @@
 /*   By: rteles <rteles@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/22 16:39:47 by rteles            #+#    #+#             */
-/*   Updated: 2023/04/04 23:15:52 by rteles           ###   ########.fr       */
+/*   Updated: 2023/04/05 00:39:45 by rteles           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -254,41 +254,42 @@ rteles!rteles@localhost PRIVMSG #general meu_bot :!game
 		channel = message.substr(message.find("#"), message.find(":")).c_str();
 		channel = channel.substr(channel.find("#"), channel.find(" ")).c_str();
 	}
+	
+	message = message.substr(message.find(":")+1, message.size()).c_str();
 
-	callBack = message.substr(message.find(":")+1, message.size()).c_str();
 
-	if (callBack.find("Hello") != std::string::npos ||
-		callBack.find("hello") != std::string::npos)
+	if (message.find("Hello") != std::string::npos ||
+		message.find("hello") != std::string::npos)
 		callBack = BOT_HELLO(user);
-	else if (callBack.find("!helpgame") != std::string::npos ||
-			callBack.find("!HelpGame") != std::string::npos ||
-			callBack.find("!HELPGAME") != std::string::npos)
+	else if (message.find("!helpgame") != std::string::npos ||
+			message.find("!HelpGame") != std::string::npos ||
+			message.find("!HELPGAME") != std::string::npos)
 		callBack = BOT_HELP_GAME();
-	else if (callBack.find("!help") != std::string::npos ||
-			callBack.find("!Help") != std::string::npos ||
-			callBack.find("!HELP") != std::string::npos)
+	else if (message.find("!help") != std::string::npos ||
+			message.find("!Help") != std::string::npos ||
+			message.find("!HELP") != std::string::npos)
 		callBack = BOT_HELP();
-	else if (callBack.find("!game") != std::string::npos ||
-			callBack.find("!Game") != std::string::npos ||
-			callBack.find("!GAME") != std::string::npos)
+	else if (message.find("!game") != std::string::npos ||
+			message.find("!Game") != std::string::npos ||
+			message.find("!GAME") != std::string::npos)
 	{
-		this->gamePlay(user, channel, message, callBack.substr(callBack.find("!game")+5, callBack.size()).c_str());
+		this->gamePlay(user, channel, message.substr(message.find("!game")+5, message.size()).c_str());
 		return ;
 	}
-	else if (callBack.find("!leaderboard") != std::string::npos)
+	else if (message.find("!leaderboard") != std::string::npos)
 	{
 		callBack = showLeaderBoard();
 		channel = "";
 	}
-	else if (callBack.find("!invite") != std::string::npos && !callBack.empty())
+	else if (message.find("!invite") != std::string::npos && !message.empty())
 	{
-		invite(callBack.substr(callBack.find("!invite")+8));
+		invite(message.substr(message.find("!invite")+8));
 		return ;
 	}
 	else
 		return ;
 	
-	debug(message, callBack,user, channel);
+	debug(message, callBack, user, channel);
 
 }
 
@@ -459,6 +460,7 @@ The code starts by sending a message to the given string.
 void	Bot::invite(std::string message)
 {
 	sendMessage("JOIN #", message);
+	std::cout << "\033[38;2;255;165;0m[" << this->_name << "] \033[0m" << "Join to " << message << std::endl;
 }
 
 /*

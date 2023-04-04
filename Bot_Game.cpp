@@ -6,7 +6,7 @@
 /*   By: rteles <rteles@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/22 16:39:47 by rteles            #+#    #+#             */
-/*   Updated: 2023/04/03 15:38:03 by rteles           ###   ########.fr       */
+/*   Updated: 2023/04/04 23:32:01 by rteles           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,7 +84,7 @@ void Bot::guessNumber(std::string nick, std::string choise, Game *game)
 		game->setWinnerOrLosser(nick, 0);
 }
 
-void Bot::gamePlay(std::string user, std::string channel, std::string message, std::string game)
+void Bot::gamePlay(std::string user, std::string channel, std::string game)
 {
 	std::string callBack = "";
 	Game		*room_game;
@@ -112,8 +112,6 @@ void Bot::gamePlay(std::string user, std::string channel, std::string message, s
 		
 		room_game->setVitory("The Number is: " + convertToString(room_game->getResult()));
 	}
-
-	(void)message;
 }
 
 Game	*Bot::addGame(std::string room, int game, int time, int reward, int result)
