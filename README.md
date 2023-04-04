@@ -2,7 +2,7 @@
 
 This is an IRC bot written in C++ that offers several features such as games, leaderboard and user welcome. Users can interact with the bot using specific custom commands, making IRC chat more interactive and fun.
 
-This project is a Bonus for [Projeto FT_IRC](https://github.com/zico15/ft_irc), this is an IRC Server.
+This project is a Bonus for [FT_IRC](https://github.com/zico15/ft_irc), this is an IRC Server.
 
 ## How it works
 The bot is divided into several files, each responsible for a different part of the bot, such as connecting to the IRC server, interpreting commands, running games, maintaining the leaderboard and more.
