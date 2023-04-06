@@ -6,7 +6,7 @@
 /*   By: rteles <rteles@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/22 16:39:47 by rteles            #+#    #+#             */
-/*   Updated: 2023/04/05 00:39:45 by rteles           ###   ########.fr       */
+/*   Updated: 2023/04/06 15:22:38 by rteles           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,8 +74,6 @@ _name(name), _hostname(host), _port(port), _password(password)
 
 	pollEvents[0].fd = _socket;
   	pollEvents[0].events = POLLIN;
-	//pollEvents[1].fd = host_connect;
-  	//pollEvents[1].events = POLLIN;
 }
 
 Bot::Bot( Bot const & src)
@@ -84,7 +82,7 @@ Bot::Bot( Bot const & src)
 }
 
 Bot::~Bot() {
-	delete pollEvents;
+	delete[] pollEvents;
 	std::cout << "\033[31mDisconnected!\033[0m" << std::endl;
 }
 
@@ -215,28 +213,8 @@ int	Bot::recive(void)
 	return this->response(message);
 }
 
-/*
-Prefixo: :rteles!rteles@localhost
-Comando: PRIVMSG
-Parâmetro 1: #public
-Parâmetro 2: Oi, como você está?
-//Envio:
-
-PRIVMSG #public :Oi, estou bem! E você?
-		ou
-PRIVMSG rteles :Oi, estou bem! E você?
-*/
 void	Bot::privateMessage(std::string message)
 {
-/*
-rteles!rteles@localhost PRIVMSG #public :Hello
-rteles!rteles@localhost PRIVMSG meu_bot :Hello, como você está?
-rteles!rteles@localhost PRIVMSG meu_bot :!help
-rteles!rteles@localhost PRIVMSG #general meu_bot :!help
-rteles!rteles@localhost PRIVMSG meu_bot :!game
-rteles!rteles@localhost PRIVMSG meu_bot :sad
-rteles!rteles@localhost PRIVMSG #general meu_bot :!game
-*/
 	std::string		user = "";
 	std::string		channel = "";
 	std::string		callBack = "";

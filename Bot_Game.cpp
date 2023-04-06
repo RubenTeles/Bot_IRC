@@ -6,7 +6,7 @@
 /*   By: rteles <rteles@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/22 16:39:47 by rteles            #+#    #+#             */
-/*   Updated: 2023/04/04 23:32:01 by rteles           ###   ########.fr       */
+/*   Updated: 2023/04/06 15:09:21 by rteles           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -124,7 +124,7 @@ Game	*Bot::addGame(std::string room, int game, int time, int reward, int result)
 		if (game == GUESS)
 			gameMessage = "Guess the Number! I'm thinking a number from 1 to 10! Using !game guess 1-10";
 		else if (game == JANKENPO)
-			gameMessage = "JanKenPo! Try too beat me! Using !game jankenpo rock/paper/scissors!";
+			gameMessage = "JanKenPo! Try too beat me! Using !game jankenpo rock/paper/scissor!";
 		debug("", BOT_GAME(gameMessage, convertToString(_games[room]->getTimeLimit())), "", room);
 	}
 
